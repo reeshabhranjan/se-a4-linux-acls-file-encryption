@@ -32,7 +32,7 @@ struct pair
 };
 
 void setacl(struct acl_data* data, char* filepath);
-void getacl(char* filepath);
+struct acl_data* getacl(char* filepath);
 int file_exists();
 
 #endif
