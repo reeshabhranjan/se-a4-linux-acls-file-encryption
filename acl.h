@@ -3,8 +3,26 @@
 
 struct acl_data
 {
-    char ** acl;
-    int acl_count;
+    char* owner;
+    char* group;
+    int user_perm;
+    int group_perm;
+    int oth_perm;
+    struct named_user* named_users;
+    struct named_group* named_groups;
+    int mask;
+};
+
+struct named_user
+{
+    char* username;
+    int permissions;
+};
+
+struct named_group
+{
+    char* groupname;
+    int permissions;
 };
 
 struct pair
