@@ -45,6 +45,74 @@ void write_pair_to_file(char* filename, char* key, char* value)
     }
 }
 
+char* read_value_from_file(char* filename, char* key)
+{
+    char user_key[strlen(key) + 5];
+    strcpy(user_key, "user.");
+    strcat(user_key, key);
+    char buffer[1000];
+    int status = getxattr(filename, user_key, buffer, 0);
+
+    if (status == -1)
+    {
+        switch (errno)
+        {
+        case E2BIG:
+            perror("Allowed size is too small for the attribute.\n");
+            exit(1);
+        
+        case ENODATA:
+            perror("The key does not exist.\n");
+            exit(1);
+
+        case ENOTSUP:
+            perror("Extended attributes are not supported by your system.\n");
+            exit(1);
+        
+        case ERANGE:
+            perror("Buffer is too small for the attribute.\n");
+            exit(1);
+        
+        default:
+            break;
+        }
+    }
+
+    int buf_size = status;
+    char* value = (char*) malloc(sizeof(char) * buf_size);
+
+    int dummy = sizeof(value);
+
+    status = getxattr(filename, user_key, value, buf_size);
+    
+    if (status == -1)
+    {
+        switch (errno)
+        {
+        case E2BIG:
+            perror("Allowed size is too small for the attribute.\n");
+            exit(1);
+        
+        case ENODATA:
+            perror("The key does not exist.\n");
+            exit(1);
+
+        case ENOTSUP:
+            perror("Extended attributes are not supported by your system.\n");
+            exit(1);
+        
+        case ERANGE:
+            perror("Buffer is too small for the attribute.\n");
+            exit(1);
+        
+        default:
+            break;
+        }
+    }
+
+    return value;
+}
+
 void setacl(struct acl_data* data, char* filepath)
 {
     char* pre_check_result[2];
@@ -83,6 +151,22 @@ void setacl(struct acl_data* data, char* filepath)
 
 struct acl_data* getacl(char* filepath)
 {
+    struct acl_data* acl = (struct acl_data*) malloc(sizeof(struct acl_data));
+    
+    char* owner = read_value_from_file(filepath, "se_acl_owner");
+    char* group = read_value_from_file(filepath, "se_acl_group");
+    char* se_acl_user_perm = read_value_from_file(filepath, "se_acl_user_perm");
+    char* se_acl_group_perm = read_value_from_file(filepath, "se_acl_group_perm");
+    char* se_acl_other_perm = read_value_from_file(filepath, "se_acl_other_perm");
+    char* se_acl_mask = read_value_from_file(filepath, "se_acl_mask");
+
+    printf("%s\n", owner);
+    printf("%s\n", group);
+    printf("%s\n", se_acl_user_perm);
+    printf("%s\n", se_acl_group_perm);
+    printf("%s\n", se_acl_other_perm);
+    printf("%s\n", se_acl_mask);
+
     return NULL;
 }
 

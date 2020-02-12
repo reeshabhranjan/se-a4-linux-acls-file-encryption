@@ -12,6 +12,7 @@ int main()
     a1.group_perm = 111;
     a1.oth_perm = 111;
     a1.mask = 777;
-    setacl(&a1, "debug/sample.txt");
+    // setacl(&a1, "debug/sample.txt");
+    getacl("debug/sample.txt");
     return 0;
 }
