@@ -5,7 +5,8 @@
 
 int main()
 {
-    setacl(NULL, "debug/sample.txt");
+    // setacl(NULL, "debug/sample.txt");
+    getacl("debug/sample.txt");
     printf("%s\n", strerror((int)errno));
     return 0;
 }

@@ -8,7 +8,7 @@ struct acl_data
 };
 
 void setacl(struct acl_data* data, char* filepath);
-void getacl();
+void getacl(char* filepath);
 int file_exists();
 
 #endif
