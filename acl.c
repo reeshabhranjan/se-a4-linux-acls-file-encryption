@@ -285,7 +285,10 @@ void setacl(struct acl_data* data, char* filepath)
     write_pair_to_file(filepath, "se_acl_group_perm", int_to_string(data -> group_perm));
     write_pair_to_file(filepath, "se_acl_other_perm", int_to_string(data -> oth_perm));
     write_pair_to_file(filepath, "se_acl_mask", int_to_string(data -> mask));
-    //TODO write named user and named groups to the file
+    write_pair_to_file(filepath, "se_acl_named_user_perm", named_entity_list_to_string(data ->named_users, data -> num_named_users));
+    write_pair_to_file(filepath, "se_acl_named_group_perm", named_entity_list_to_string(data -> named_groups, data ->num_named_groups));
+    write_pair_to_file(filepath, "se_acl_num_named_users", int_to_string(data -> num_named_users));
+    write_pair_to_file(filepath, "se_acl_num_named_groups", int_to_string(data -> num_named_groups));
 }
 
 struct acl_data* getacl(char* filepath)
@@ -298,6 +301,10 @@ struct acl_data* getacl(char* filepath)
     int se_acl_group_perm = atoi(read_value_from_file(filepath, "se_acl_group_perm"));
     int se_acl_other_perm = atoi(read_value_from_file(filepath, "se_acl_other_perm"));
     int se_acl_mask = atoi(read_value_from_file(filepath, "se_acl_mask"));
+    int num_named_users = atoi(read_value_from_file(filepath, "se_acl_num_named_user_perm"));
+    int num_named_groups = atoi(read_value_from_file(filepath, "se_acl_num_named_group_perm"));
+    struct named_entity** named_users = string_to_named_entity_list(read_value_from_file(filepath, "se_acl_named_users"), num_named_users);
+    struct named_entity** named_groups = string_to_named_entity_list(read_value_from_file(filepath, "se_acl_named_groups"), num_named_groups);
 
     acl -> owner = owner;
     acl -> group = group;
@@ -305,6 +312,10 @@ struct acl_data* getacl(char* filepath)
     acl -> group_perm = se_acl_group_perm;
     acl -> oth_perm = se_acl_user_perm;
     acl -> mask = se_acl_mask;
+    acl -> num_named_users = num_named_users;
+    acl -> num_named_groups = num_named_groups;
+    acl -> named_users = named_users;
+    acl -> named_groups = named_groups;
 
     return acl;
 }
