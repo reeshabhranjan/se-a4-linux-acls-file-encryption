@@ -32,6 +32,13 @@ int file_exists(char* filepath)
     return _file_exists;
 }
 
+int acl_exists(char* filepath)
+{
+    char* pre_check_result[2];
+    int pre_check = getxattr(filepath, "user.se_acl_exists", pre_check_result, sizeof(pre_check_result));
+    return pre_check + 1;
+}
+
 
 void write_pair_to_file(char* filename, char* key, char* value)
 {
@@ -113,11 +120,31 @@ char* read_value_from_file(char* filename, char* key)
     return value;
 }
 
+int array_length(struct named_entity* array)
+{
+    int length = (int) (sizeof(array) / sizeof(array[0]));
+    return length;
+}
+
+char* named_entity_to_string(struct named_entity* named_permission)
+{
+    int req_len = snprintf(NULL, 0, "%s|%d", named_permission -> username, named_permission -> permissions) + 1;
+    char* perm_str = (char*) malloc(req_len);
+    
+    if (perm_str == NULL)
+    {
+        perror("Internal failure: Cannot allocate memory for named user/group permissions.\n");
+        exit(1);
+    }
+
+    snprintf(perm_str, req_len, "%s|%d", named_permission -> username, named_permission ->permissions);
+
+    return perm_str;
+}
+
 void setacl(struct acl_data* data, char* filepath)
 {
-    char* pre_check_result[2];
-    int pre_check = getxattr(filepath, "user.se_acl_exists", pre_check_result, sizeof(pre_check_result));
-    if (pre_check == -1)
+    if (!acl_exists(filepath))
     {
         switch (errno)
         {
