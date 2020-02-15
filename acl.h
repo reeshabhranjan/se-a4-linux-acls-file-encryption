@@ -1,6 +1,14 @@
 #ifndef ACL_H
 #define ACL_H
 
+// structures
+
+struct pair
+{
+    char *first;
+    char *second;
+};
+
 struct named_entity
 {
     char* name;
@@ -14,23 +22,12 @@ struct acl_data
     int user_perm;
     int group_perm;
     int oth_perm;
-    struct named_entity* named_users;
-    struct named_entity* named_groups;
+    struct named_entity** named_users;
+    struct named_entity** named_groups;
     int mask;
 };
 
-
-struct named_group
-{
-    char* groupname;
-    int permissions;
-};
-
-struct pair
-{
-    char *first;
-    char *second;
-};
+// function declarations
 
 void setacl(struct acl_data* data, char* filepath);
 struct acl_data* getacl(char* filepath);

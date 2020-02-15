@@ -128,7 +128,7 @@ int array_length(struct named_entity* array)
 
 char* named_entity_to_string(struct named_entity* named_permission)
 {
-    int req_len = snprintf(NULL, 0, "%s|%d", named_permission -> username, named_permission -> permissions) + 1;
+    int req_len = snprintf(NULL, 0, "%s|%d", named_permission -> name, named_permission -> permissions) + 1;
     char* perm_str = (char*) malloc(req_len);
     
     if (perm_str == NULL)
@@ -137,9 +137,14 @@ char* named_entity_to_string(struct named_entity* named_permission)
         exit(1);
     }
 
-    snprintf(perm_str, req_len, "%s|%d", named_permission -> username, named_permission ->permissions);
+    snprintf(perm_str, req_len, "%s|%d", named_permission -> name, named_permission ->permissions);
 
     return perm_str;
+}
+
+char* named_entity_list_to_string(struct named_entity** named_entities)
+{
+    
 }
 
 void setacl(struct acl_data* data, char* filepath)
