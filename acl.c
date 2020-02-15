@@ -155,18 +155,18 @@ struct acl_data* getacl(char* filepath)
     
     char* owner = read_value_from_file(filepath, "se_acl_owner");
     char* group = read_value_from_file(filepath, "se_acl_group");
-    char* se_acl_user_perm = read_value_from_file(filepath, "se_acl_user_perm");
-    char* se_acl_group_perm = read_value_from_file(filepath, "se_acl_group_perm");
-    char* se_acl_other_perm = read_value_from_file(filepath, "se_acl_other_perm");
-    char* se_acl_mask = read_value_from_file(filepath, "se_acl_mask");
+    int se_acl_user_perm = atoi(read_value_from_file(filepath, "se_acl_user_perm"));
+    int se_acl_group_perm = atoi(read_value_from_file(filepath, "se_acl_group_perm"));
+    int se_acl_other_perm = atoi(read_value_from_file(filepath, "se_acl_other_perm"));
+    int se_acl_mask = atoi(read_value_from_file(filepath, "se_acl_mask"));
 
-    printf("%s\n", owner);
-    printf("%s\n", group);
-    printf("%s\n", se_acl_user_perm);
-    printf("%s\n", se_acl_group_perm);
-    printf("%s\n", se_acl_other_perm);
-    printf("%s\n", se_acl_mask);
+    acl -> owner = owner;
+    acl -> group = group;
+    acl -> user_perm = se_acl_user_perm;
+    acl -> group_perm = se_acl_group_perm;
+    acl -> oth_perm = se_acl_user_perm;
+    acl -> mask = se_acl_mask;
 
-    return NULL;
+    return acl;
 }
 
