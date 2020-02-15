@@ -24,6 +24,8 @@ struct acl_data
     int oth_perm;
     struct named_entity** named_users;
     struct named_entity** named_groups;
+    int num_named_users;
+    int num_named_groups;
     int mask;
 };
 
@@ -33,5 +35,5 @@ void setacl(struct acl_data* data, char* filepath);
 struct acl_data* getacl(char* filepath);
 int file_exists();
 int add_permission(char* filepath, char* permission, int type);
-
+char* named_entity_list_to_string(struct named_entity** named_entities, int num_named_entities);
 #endif

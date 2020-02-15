@@ -120,15 +120,24 @@ char* read_value_from_file(char* filename, char* key)
     return value;
 }
 
-int array_length(struct named_entity* array)
+int array_length(struct named_entity** array)
 {
-    int length = (int) (sizeof(array) / sizeof(array[0]));
+    // int length = (int) (sizeof(array) / sizeof(array));
+
+    int length = 0;
+
+    while (array != NULL)
+    {
+        array++;
+        length++;
+    }
+
     return length;
 }
 
 char* named_entity_to_string(struct named_entity* named_permission)
 {
-    int req_len = snprintf(NULL, 0, "%s|%d", named_permission -> name, named_permission -> permissions) + 1;
+    int req_len = strlen(named_permission -> name) + strlen(int_to_string(named_permission ->permissions)) + 1 + 1; // +1 for "|" and +1 for null termination 
     char* perm_str = (char*) malloc(req_len);
     
     if (perm_str == NULL)
@@ -142,9 +151,38 @@ char* named_entity_to_string(struct named_entity* named_permission)
     return perm_str;
 }
 
-char* named_entity_list_to_string(struct named_entity** named_entities)
+char* named_entity_list_to_string(struct named_entity** named_entities, int num_named_entities)
 {
+    int combined_string_len = 0;
+
+    // calculate the length of the entire string
+    for (int i = 0; i < num_named_entities; i++)
+    {
+        char* converted_string = named_entity_to_string(*named_entities + i);
+        combined_string_len += strlen(converted_string) + 1; // + 1 for comma-separation
+    }
+
+    char* combined_string = (char*) malloc(combined_string_len + 1); // + 1 for null-termination
+
+    int string_position = 0;
+    for (int i = 0; i < num_named_entities; i++)
+    {
+        char* converted_string = named_entity_to_string(*named_entities + i);
+
+        for (int j = 0; j < (int) strlen(converted_string); j++)
+        {
+            combined_string[string_position] = converted_string[j];
+            string_position++;
+            // printf("%d ", i + j);
+            // printf("%c ", converted_string[j]);
+        }
+        combined_string[string_position] = ';';
+        string_position++;
+    }
+
+    combined_string[combined_string_len] = '\0';
     
+    return combined_string;
 }
 
 void setacl(struct acl_data* data, char* filepath)
