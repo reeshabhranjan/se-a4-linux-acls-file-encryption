@@ -36,4 +36,5 @@ struct acl_data* getacl(char* filepath);
 int file_exists();
 int add_permission(char* filepath, char* permission, int type);
 char* named_entity_list_to_string(struct named_entity** named_entities, int num_named_entities);
+struct named_entity** string_to_named_entity_list(char* string, int num_entities);
 #endif

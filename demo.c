@@ -31,10 +31,16 @@ int main()
     n2.name = "reeshu";
     n2.permissions = 000;
 
-    struct named_entity* named_entities[] = {};
+    struct named_entity* named_entities[] = {&n1, &n2};
 
-    char* s = named_entity_list_to_string(named_entities, 0);
+    char* s = named_entity_list_to_string(named_entities, 2);
+    struct named_entity** n = string_to_named_entity_list(s, 2);
 
-    printf("%s\n", s);
+    struct named_entity* np1 = *n;
+    struct named_entity* np2 = *(n + 1);
+
+    printf("%s\n", np2->name);
+
+    // printf("%s\n", s);
     return 0;
 }

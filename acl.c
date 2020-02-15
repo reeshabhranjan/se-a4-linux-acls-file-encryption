@@ -7,6 +7,10 @@
 #include<stdlib.h>
 #include<string.h>
 
+// constants
+#define MEMBER_DELIMITER '|'
+#define STRUCT_DELIMITER ';'
+
 int num_digits(int x)
 {
     int n = 0;
@@ -16,6 +20,38 @@ int num_digits(int x)
         n++;
     }
     return n;
+}
+
+int strfind(char* hay, char needle)
+{
+    int pos = -1;
+    int n = strlen(hay);
+
+    for (int i = 0; i < n; i++)
+    {
+        if (hay[i] == needle)
+        {
+            pos = i;
+            break;
+        }
+    }
+
+    return pos;
+}
+
+char* substring(char* string, int start, int end)
+{
+    int n = end - start + 1;
+    char* _substring = (char*) malloc(n + 1); // + 1 for null termination
+
+    for (int i = start; i < end; i++)
+    {
+        _substring[i - start] = string[i];
+    }
+
+    _substring[n] = '\0';
+
+    return _substring;
 }
 
 char* int_to_string(int x)
@@ -146,7 +182,7 @@ char* named_entity_to_string(struct named_entity* named_permission)
         exit(1);
     }
 
-    snprintf(perm_str, req_len, "%s|%d", named_permission -> name, named_permission ->permissions);
+    snprintf(perm_str, req_len, "%s%c%d", named_permission -> name, MEMBER_DELIMITER, named_permission ->permissions);
 
     return perm_str;
 }
@@ -173,16 +209,49 @@ char* named_entity_list_to_string(struct named_entity** named_entities, int num_
         {
             combined_string[string_position] = converted_string[j];
             string_position++;
-            // printf("%d ", i + j);
-            // printf("%c ", converted_string[j]);
         }
-        combined_string[string_position] = ';';
+        combined_string[string_position] = STRUCT_DELIMITER;
         string_position++;
     }
 
     combined_string[combined_string_len] = '\0';
     
     return combined_string;
+}
+
+struct named_entity* string_to_named_entity(char* string)
+{
+    int n = strlen(string);
+    int pos_delimiter = strfind(string, MEMBER_DELIMITER);
+    char* name = substring(string, 0, pos_delimiter);
+    char* perm_string = substring(string, pos_delimiter + 1, n);
+    int permission = atoi(perm_string);
+    
+    struct named_entity* named_permission = (struct named_entity*) malloc(sizeof(struct named_entity));
+    named_permission -> name = name;
+    named_permission -> permissions = permission;
+
+    return named_permission;
+}
+
+struct named_entity** string_to_named_entity_list(char* string, int num_entities)
+{
+    int n = strlen(string);
+
+    int starting_index = 0;
+
+    struct named_entity** named_entity_list = (struct named_entity**) calloc(num_entities, sizeof(struct named_entity));
+
+    for (int i = 0; i < num_entities; i++)
+    {
+        int ending_index = starting_index + strfind(string + starting_index, STRUCT_DELIMITER);
+        char* entity_string = substring(string, starting_index, ending_index);
+        struct named_entity* named_permissions = string_to_named_entity(entity_string);
+        *(named_entity_list + i) = named_permissions;
+        starting_index = ending_index + 1;
+    }
+
+    return named_entity_list;
 }
 
 void setacl(struct acl_data* data, char* filepath)
