@@ -47,6 +47,7 @@ int main()
 
     // TODO handle file not exists (causing segfault)
     // TODO handle pointers in setacl, getacl (make it uniform)
+    // TODO free dynamically allocated memory
     setacl(a1, "debug_files/sample.txt");
     // printf("hello\n");
     struct acl_data* a2 = getacl("debug_files/sample.txt");
@@ -66,5 +67,6 @@ int main()
     }
     printf("mask: %d\n", a2 -> mask);
     
+    printf("%d\n", GROUP_TYPE);
     return 0;
 }

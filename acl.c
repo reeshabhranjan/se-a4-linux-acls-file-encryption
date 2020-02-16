@@ -24,6 +24,14 @@ char* NUM_NAMED_USERS_KEY = "se_acl_num_named_users";
 char* NUM_NAMED_GROUPS_KEY = "se_acl_num_named_groups";
 char* MASK_KEY = "se_acl_mask";
 
+// types
+const int OWNER_TYPE = 0;
+const int GROUP_TYPE = 1;
+const int OTHER_TYPE = 2;
+const int NAMED_USER_TYPE = 3;
+const int NAMED_GROUP_TYPE = 4;
+const int MASK_TYPE = 5;
+
 int num_digits(int x)
 {
     int n = 0;
@@ -343,4 +351,6 @@ struct acl_data* getacl(char* filepath)
 
     return acl;
 }
+
+// interface functions
 

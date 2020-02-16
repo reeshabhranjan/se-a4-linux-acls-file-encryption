@@ -29,12 +29,25 @@ struct acl_data
     int mask;
 };
 
+// TODO convert to enum
+extern const int OWNER_TYPE;
+extern const int GROUP_TYPE;
+extern const int OTHER_TYPE;
+extern const int NAMED_USER_TYPE;
+extern const int NAMED_GROUP_TYPE;
+extern const int MASK_TYPE;
+
 // function declarations
 
+// essential functions
 void setacl(struct acl_data* data, char* filepath);
 struct acl_data* getacl(char* filepath);
 int file_exists();
 int add_permission(char* filepath, char* permission, int type);
 char* named_entity_list_to_string(struct named_entity** named_entities, int num_named_entities);
 struct named_entity** string_to_named_entity_list(char* string, int num_entities);
+
+// interface functions
+// void set_permission(enum per)
+
 #endif
