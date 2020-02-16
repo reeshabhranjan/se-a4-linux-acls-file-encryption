@@ -84,7 +84,9 @@ void write_pair_to_file(char* filename, char* key, char* value)
     int dummy = 0;
     if (setxattr(filename, user_key, value, sizeof(user_key), XATTR_CREATE) == -1)
     {
+        printf("%s\n", strerror(errno));
         setxattr(filename, user_key, value, sizeof(user_key), XATTR_REPLACE);
+        printf("%s\n", strerror(errno));
     }
 }
 
@@ -194,7 +196,7 @@ char* named_entity_list_to_string(struct named_entity** named_entities, int num_
     // calculate the length of the entire string
     for (int i = 0; i < num_named_entities; i++)
     {
-        char* converted_string = named_entity_to_string(*named_entities + i);
+        char* converted_string = named_entity_to_string(*(named_entities + i));
         combined_string_len += strlen(converted_string) + 1; // + 1 for comma-separation
     }
 
@@ -203,7 +205,7 @@ char* named_entity_list_to_string(struct named_entity** named_entities, int num_
     int string_position = 0;
     for (int i = 0; i < num_named_entities; i++)
     {
-        char* converted_string = named_entity_to_string(*named_entities + i);
+        char* converted_string = named_entity_to_string(*(named_entities + i));
 
         for (int j = 0; j < (int) strlen(converted_string); j++)
         {

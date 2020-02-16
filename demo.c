@@ -7,7 +7,7 @@
 int main()
 {
     struct acl_data* a1 = (struct acl_data*) malloc(sizeof(struct acl_data));
-    a1 -> owner = "reeshabh";
+    a1 -> owner = "reeshabhkumarranjan";
     a1 -> group = "reeshabh's group";
     a1 -> user_perm = 111;
     a1 -> group_perm = 222;
@@ -45,8 +45,9 @@ int main()
     a1 -> num_named_users = 2;
     a1 -> num_named_groups = 2;
 
-    setacl(a1, "debug/sample.txt");
+    // TODO handle file not exists (causing segfault)
+    setacl(a1, "debug_files/sample.txt");
     printf("hello\n");
-    struct acl_data* a2 = getacl("debug/sample.txt");
+    struct acl_data* a2 = getacl("debug_files/sample.txt");
     return 0;
 }
