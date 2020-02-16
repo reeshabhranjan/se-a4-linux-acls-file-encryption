@@ -7,9 +7,22 @@
 #include<stdlib.h>
 #include<string.h>
 
-// constants
+// delimiters
 #define MEMBER_DELIMITER '|'
 #define STRUCT_DELIMITER ';'
+
+// keys
+char* ACL_EXISTS_KEY = "se_acl_exists";
+char* OWNER_KEY = "se_acl_owner";
+char* GROUP_KEY = "se_acl_group";
+char* OWNER_PERM_KEY = "se_acl_owner_perm";
+char* GROUP_PERM_KEY = "se_acl_group_perm";
+char* OTHER_PERM_KEY = "se_acl_other_perm";
+char* NAMED_USER_PERMS_KEY = "se_acl_named_user";
+char* NAMED_GROUPS_PERMS_KEY = "se_acl_named_group";
+char* NUM_NAMED_USERS_KEY = "se_acl_num_named_users";
+char* NUM_NAMED_GROUPS_KEY = "se_acl_num_named_groups";
+char* MASK_KEY = "se_acl_mask";
 
 int num_digits(int x)
 {
@@ -68,33 +81,42 @@ int file_exists(char* filepath)
     return _file_exists;
 }
 
+char* setup_key(char* key)
+{
+    char* user_key = (char*) malloc(strlen(key) + 5);
+    strcpy(user_key, "user.");
+    strcat(user_key, key);
+    return user_key;
+}
+
 int acl_exists(char* filepath)
 {
     char* pre_check_result[2];
-    int pre_check = getxattr(filepath, "user.se_acl_exists", pre_check_result, sizeof(pre_check_result));
+    char* user_key = setup_key(ACL_EXISTS_KEY);
+    int pre_check = getxattr(filepath, user_key, pre_check_result, sizeof(pre_check_result));
     return pre_check + 1;
 }
 
 
 void write_pair_to_file(char* filename, char* key, char* value)
 {
-    char user_key[strlen(key) + 5];
-    strcpy(user_key, "user.");
-    strcat(user_key, key);
+    // char user_key[strlen(key) + 5];
+    // strcpy(user_key, "user.");
+    // strcat(user_key, key);
+    char* user_key = setup_key(key);
     int dummy = 0;
     if (setxattr(filename, user_key, value, strlen(value) + 1, XATTR_CREATE) == -1)
     {
-        printf("%s\n", strerror(errno));
         setxattr(filename, user_key, value, strlen(value) + 1, XATTR_REPLACE);
-        printf("%s\n", strerror(errno));
     }
 }
 
 char* read_value_from_file(char* filename, char* key)
 {
-    char user_key[strlen(key) + 5];
-    strcpy(user_key, "user.");
-    strcat(user_key, key);
+    // char user_key[strlen(key) + 5];
+    // strcpy(user_key, "user.");
+    // strcat(user_key, key);
+    char* user_key = setup_key(key);
     char buffer[1000];
     int status = getxattr(filename, user_key, buffer, 0);
 
@@ -269,7 +291,7 @@ void setacl(struct acl_data* data, char* filepath)
         
         case ENODATA:
             perror("This file does not contain acl structure, creating one now");
-            write_pair_to_file(filepath, "se_acl_exists", "Y");
+            write_pair_to_file(filepath, ACL_EXISTS_KEY, "Y");
             break;
         
         case ENOTSUP:
@@ -281,32 +303,32 @@ void setacl(struct acl_data* data, char* filepath)
         }
     }
 
-    write_pair_to_file(filepath, "se_acl_owner", data -> owner);
-    write_pair_to_file(filepath, "se_acl_group", data -> group);
-    write_pair_to_file(filepath, "se_acl_user_perm", int_to_string(data -> user_perm));
-    write_pair_to_file(filepath, "se_acl_group_perm", int_to_string(data -> group_perm));
-    write_pair_to_file(filepath, "se_acl_other_perm", int_to_string(data -> oth_perm));
-    write_pair_to_file(filepath, "se_acl_mask", int_to_string(data -> mask));
-    write_pair_to_file(filepath, "se_acl_named_user_perm", named_entity_list_to_string(data ->named_users, data -> num_named_users));
-    write_pair_to_file(filepath, "se_acl_named_group_perm", named_entity_list_to_string(data -> named_groups, data ->num_named_groups));
-    write_pair_to_file(filepath, "se_acl_num_named_users", int_to_string(data -> num_named_users));
-    write_pair_to_file(filepath, "se_acl_num_named_groups", int_to_string(data -> num_named_groups));
+    write_pair_to_file(filepath, OWNER_KEY, data -> owner);
+    write_pair_to_file(filepath, GROUP_KEY, data -> group);
+    write_pair_to_file(filepath, OWNER_PERM_KEY, int_to_string(data -> user_perm));
+    write_pair_to_file(filepath, GROUP_PERM_KEY, int_to_string(data -> group_perm));
+    write_pair_to_file(filepath, OTHER_PERM_KEY, int_to_string(data -> oth_perm));
+    write_pair_to_file(filepath, MASK_KEY, int_to_string(data -> mask));
+    write_pair_to_file(filepath, NAMED_USER_PERMS_KEY, named_entity_list_to_string(data ->named_users, data -> num_named_users));
+    write_pair_to_file(filepath, NAMED_GROUPS_PERMS_KEY, named_entity_list_to_string(data -> named_groups, data ->num_named_groups));
+    write_pair_to_file(filepath, NUM_NAMED_USERS_KEY, int_to_string(data -> num_named_users));
+    write_pair_to_file(filepath, NUM_NAMED_GROUPS_KEY, int_to_string(data -> num_named_groups));
 }
 
 struct acl_data* getacl(char* filepath)
 {
     struct acl_data* acl = (struct acl_data*) malloc(sizeof(struct acl_data));
     
-    char* owner = read_value_from_file(filepath, "se_acl_owner");
-    char* group = read_value_from_file(filepath, "se_acl_group");
-    int se_acl_user_perm = atoi(read_value_from_file(filepath, "se_acl_user_perm"));
-    int se_acl_group_perm = atoi(read_value_from_file(filepath, "se_acl_group_perm"));
-    int se_acl_other_perm = atoi(read_value_from_file(filepath, "se_acl_other_perm"));
-    int se_acl_mask = atoi(read_value_from_file(filepath, "se_acl_mask"));
-    int num_named_users = atoi(read_value_from_file(filepath, "se_acl_num_named_users"));
-    int num_named_groups = atoi(read_value_from_file(filepath, "se_acl_num_named_groups"));
-    struct named_entity** named_users = string_to_named_entity_list(read_value_from_file(filepath, "se_acl_named_user_perm"), num_named_users);
-    struct named_entity** named_groups = string_to_named_entity_list(read_value_from_file(filepath, "se_acl_named_group_perm"), num_named_groups);
+    char* owner = read_value_from_file(filepath, OWNER_KEY);
+    char* group = read_value_from_file(filepath, GROUP_KEY);
+    int se_acl_user_perm = atoi(read_value_from_file(filepath, OWNER_PERM_KEY));
+    int se_acl_group_perm = atoi(read_value_from_file(filepath, GROUP_PERM_KEY));
+    int se_acl_other_perm = atoi(read_value_from_file(filepath, OTHER_PERM_KEY));
+    int se_acl_mask = atoi(read_value_from_file(filepath, MASK_KEY));
+    int num_named_users = atoi(read_value_from_file(filepath, NUM_NAMED_USERS_KEY));
+    int num_named_groups = atoi(read_value_from_file(filepath, NUM_NAMED_GROUPS_KEY));
+    struct named_entity** named_users = string_to_named_entity_list(read_value_from_file(filepath, NAMED_USER_PERMS_KEY), num_named_users);
+    struct named_entity** named_groups = string_to_named_entity_list(read_value_from_file(filepath, NAMED_GROUPS_PERMS_KEY), num_named_groups);
 
     acl -> owner = owner;
     acl -> group = group;

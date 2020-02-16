@@ -48,7 +48,23 @@ int main()
     // TODO handle file not exists (causing segfault)
     // TODO handle pointers in setacl, getacl (make it uniform)
     setacl(a1, "debug_files/sample.txt");
-    printf("hello\n");
+    // printf("hello\n");
     struct acl_data* a2 = getacl("debug_files/sample.txt");
+    printf("owner: %s\n", a2 -> owner);
+    printf("group: %s\n", a2 -> group);
+    printf("owner_perm: %d\n", a2 -> user_perm);
+    printf("group_perm: %d\n", a2 -> group_perm);
+    printf("other_perm: %d\n", a2 -> oth_perm);
+    printf("named_users:\n");
+    for (int i = 0; i < a2 -> num_named_users; i++)
+    {
+        printf("username: %s permission: %d\n", (*(named_users + i)) -> name, (*(named_users + i)) -> permissions);
+    }
+    for (int i = 0; i < a2 -> num_named_users; i++)
+    {
+        printf("groupname: %s permission: %d\n", (*(named_groups + i)) -> name, (*(named_groups + i)) -> permissions);
+    }
+    printf("mask: %d\n", a2 -> mask);
+    
     return 0;
 }
