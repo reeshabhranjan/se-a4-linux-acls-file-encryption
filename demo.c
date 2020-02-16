@@ -23,11 +23,11 @@ int main()
     u2 -> permissions = 666;
 
     struct named_entity* g1 = (struct named_entity*) malloc(sizeof(struct named_entity));
-    g1 -> name = "rohan's group";
+    g1 -> name = "group1";
     g1 -> permissions = 777;
 
     struct named_entity* g2 = (struct named_entity*) malloc(sizeof(struct named_entity));
-    g2 -> name = "rajesh's group";
+    g2 -> name = "group2";
     g2 -> permissions = 888;
 
     struct named_entity** named_users = (struct named_entity**) calloc(2, sizeof(struct named_entity*));
@@ -46,6 +46,7 @@ int main()
     a1 -> num_named_groups = 2;
 
     // TODO handle file not exists (causing segfault)
+    // TODO handle pointers in setacl, getacl (make it uniform)
     setacl(a1, "debug_files/sample.txt");
     printf("hello\n");
     struct acl_data* a2 = getacl("debug_files/sample.txt");
