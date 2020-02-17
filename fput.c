@@ -5,6 +5,8 @@
 #include<error.h>
 #include<errno.h>
 #include<string.h>
+#include<pwd.h>
+#include "acl.h"
 
 int main(int argc, char* argv[])
 {
@@ -22,6 +24,16 @@ int main(int argc, char* argv[])
     }
 
     char* filepath = argv[1];
+
+    int caller_uid = getuid();
+    struct passwd* pwd = getpwuid(caller_uid);
+    char* caller_name = pwd -> pw_name;
+
+    if (!validate(caller_name, filepath, 10))
+    {
+        perror("You do not have sufficient permission.");
+        exit(1);
+    }
 
     printf("Enter a string (under 100 characters)\n");
     char s[100000];
