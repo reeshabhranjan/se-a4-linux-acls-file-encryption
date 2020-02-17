@@ -1,5 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
+#include<unistd.h>
+#include<fcntl.h>
 
 int main(int argc, char* argv[])
 {
@@ -18,15 +20,11 @@ int main(int argc, char* argv[])
     char* filepath = argv[1];
 
     char buf[10000];
-    
-    FILE* file = fopen(filepath, "r");
-    char c = fgetc(file);
 
-    while (c != EOF)
-    {
-        printf("%c", c);
-        c = fgetc(file);
-    }
+    int fd = open(filepath, O_RDONLY);
+    read(fd, buf, 10000);
+
+    printf("%s", buf);
     
     return 0;
 }
