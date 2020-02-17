@@ -23,4 +23,5 @@ int main(int argc, char* argv[])
     FILE* file = fopen(filepath, "a+");
     fputs(s, file);
     fclose(file);
+    return 0;
 }
