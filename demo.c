@@ -7,27 +7,27 @@
 int main()
 {
     struct acl_data* a1 = (struct acl_data*) malloc(sizeof(struct acl_data));
-    a1 -> owner = "reeshabhkumarranjan";
-    a1 -> group = "reeshabh's group";
+    a1 -> owner = "reeshabh";
+    a1 -> group = "reeshabh";
     a1 -> user_perm = 111;
     a1 -> group_perm = 222;
     a1 -> oth_perm = 333;
     a1 -> mask = 444;
 
     struct named_entity* u1 = (struct named_entity*) malloc(sizeof(struct named_entity));
-    u1 -> name = "rohan";
+    u1 -> name = "face";
     u1 -> permissions = 555;
 
     struct named_entity* u2 = (struct named_entity*) malloc(sizeof(struct named_entity));
-    u2 -> name = "rajesh";
+    u2 -> name = "eye";
     u2 -> permissions = 666;
 
     struct named_entity* g1 = (struct named_entity*) malloc(sizeof(struct named_entity));
-    g1 -> name = "group1";
+    g1 -> name = "krypton";
     g1 -> permissions = 777;
 
     struct named_entity* g2 = (struct named_entity*) malloc(sizeof(struct named_entity));
-    g2 -> name = "group2";
+    g2 -> name = "earth";
     g2 -> permissions = 888;
 
     struct named_entity** named_users = (struct named_entity**) calloc(2, sizeof(struct named_entity*));
@@ -68,6 +68,21 @@ int main()
     }
     printf("mask: %d\n", a2 -> mask);
     
-    printf("%d\n", GROUP_TYPE);
+    // testing validate
+    char* username1 = "face";
+    int permissions1 = 222;
+    printf("validating %s for %d permissions: %d\n\n", username1, permissions1, validate(username1, "debug_files/sample.txt", permissions1));
+    
+    char* username2 = "eye";
+    int permissions2 = 333;
+    printf("validating %s for %d permissions: %d\n\n", username2, permissions2, validate(username2, "debug_files/sample.txt", permissions2));
+    
+    char* username3 = "reeshabh";
+    int permissions3 = 111;
+    printf("validating %s for %d permissions: %d\n\n", username3, permissions3, validate(username3, "debug_files/sample.txt", permissions3));
+
+
+    
+
     return 0;
 }

@@ -38,6 +38,7 @@ const int USER_TYPE = 6;
 
 // code constants
 #define MAX_GROUP_COUNT 65536
+#define DEBUG_MODE 1
 
 int num_digits(int x)
 {
@@ -489,10 +490,8 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
 {
     struct acl_data* acl = getacl(filename);
 
-    switch (perm_type)
+    if (perm_type == USER_TYPE)
     {
-
-    case USER_TYPE:
 
         if (strcmp(entity_name, acl -> owner) == 0)
         {
@@ -505,9 +504,10 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
             update_named_entity_permission(perm_type, filename, acl, entity_name, permission);
         }
         
-        break;
+    }
 
-    case GROUP_TYPE:
+    else if (perm_type == GROUP_TYPE)
+    {
         
         if (strcmp(entity_name, acl -> group) == 0)
         {
@@ -521,12 +521,14 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
             update_named_entity_permission(perm_type, filename, acl, entity_name, permission);
         }
     
-        break;
+    }
     
-    default:
+    else
+    {
         perror("Incorrect perm_type provided.");
         exit(1);
     }
+    
 }
 
 int check_permissions(int file_permission, int requested_permission)
@@ -644,12 +646,20 @@ int validate(char* username, char* filename, int permissions)
     // if owner
     if (strcmp(username, acl -> owner) == 0)
     {
+        if (DEBUG_MODE)
+        {
+            printf("User lies in the category: OWNER\n");
+        }
         return check_permissions(acl -> user_perm, permissions);
     }
 
     // if group
     if (user_is_in_file_group(username, filename))
     {
+        if (DEBUG_MODE)
+        {
+            printf("User lies in the category: GROUP_MEMBER\n");
+        }
         return check_permissions(acl -> group_perm, permissions);
     }
 
@@ -658,6 +668,10 @@ int validate(char* username, char* filename, int permissions)
 
     if (named_user) // equivalent to is named_user is not NULL?
     {
+        if (DEBUG_MODE)
+        {
+            printf("User lies in the category: NAMED_USER\n");
+        }
         return check_permissions(named_user -> permissions, permissions);
     }
 
@@ -666,9 +680,17 @@ int validate(char* username, char* filename, int permissions)
 
     if (named_group) // equivalent to is named_user not NULL?
     {
+        if (DEBUG_MODE)
+        {
+            printf("User lies in the category: NAMED_GROUP_MEMBER\n");
+        }
         return check_permissions(named_group -> permissions, permissions);
     }
 
     // if other
+    if (DEBUG_MODE)
+    {
+        printf("User lies in the category: OTHER\n");
+    }
     return check_permissions(acl -> oth_perm, permissions);
 }
