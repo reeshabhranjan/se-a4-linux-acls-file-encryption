@@ -34,6 +34,7 @@ const int OTHER_TYPE = 2;
 const int NAMED_USER_TYPE = 3;
 const int NAMED_GROUP_TYPE = 4;
 const int MASK_TYPE = 5;
+const int USER_TYPE = 6;
 
 int num_digits(int x)
 {
@@ -375,7 +376,7 @@ struct acl_data* getacl(char* filepath)
 
     if (!acl_exists(filepath))
     {
-        create_basic_acl(filepath);
+        return create_basic_acl(filepath);
     }
 
     struct acl_data* acl = (struct acl_data*) malloc(sizeof(struct acl_data));
@@ -410,4 +411,42 @@ struct acl_data* getacl(char* filepath)
 void set_permission(char* filename, int perm_type, char* entity_name, int permission)
 {
     struct acl_data* acl = getacl(filename);
+
+    switch (perm_type)
+    {
+    case USER_TYPE:
+        if (strcmp(entity_name, acl -> owner) == 0)
+        {
+            acl -> user_perm = permission;
+            setacl(acl, filename);
+        }
+        else
+        {
+            // TODO define this function
+            update_named_entity_permission(perm_type, filename, acl, entity_name);
+        }
+        
+        break;
+
+    case GROUP_TYPE:
+        
+        if (strcmp(entity_name, acl -> group) == 0)
+        {
+            acl -> group_perm = permission;
+            setacl(acl, filename);
+        }
+
+        else
+        {
+            // TODO define this function
+            update_named_entity_permission(perm_type, filename, acl, entity_name);
+        }
+        
+
+        break;
+    
+    default:
+        perror("Incorrect perm_type.");
+        exit(1);
+    }
 }

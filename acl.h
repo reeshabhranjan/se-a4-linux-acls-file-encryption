@@ -36,6 +36,7 @@ extern const int OTHER_TYPE;
 extern const int NAMED_USER_TYPE;
 extern const int NAMED_GROUP_TYPE;
 extern const int MASK_TYPE;
+extern const int USER_TYPE;
 
 // function declarations
 
