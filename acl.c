@@ -36,6 +36,9 @@ const int NAMED_GROUP_TYPE = 4;
 const int MASK_TYPE = 5;
 const int USER_TYPE = 6;
 
+// code constants
+#define MAX_GROUP_COUNT 65536
+
 int num_digits(int x)
 {
     int n = 0;
@@ -524,4 +527,148 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
         perror("Incorrect perm_type provided.");
         exit(1);
     }
+}
+
+int check_permissions(int file_permission, int requested_permission)
+{
+    int file_permission_read = file_permission / 100;
+    file_permission -= file_permission_read * 100;
+    int file_permission_write = file_permission / 10;
+    file_permission -= file_permission_write * 10;
+    int file_permission_execute = file_permission;
+    
+    int requested_permission_read = requested_permission / 100;
+    requested_permission -= requested_permission_read * 100;
+    int requested_permission_write = requested_permission / 10;
+    requested_permission -= requested_permission_write * 10;
+    int requested_permission_execute = requested_permission;
+
+    int read_violation = requested_permission_read > file_permission_read;
+    int write_violation = requested_permission_write > file_permission_write;
+    int execute_violation = requested_permission_execute > file_permission_execute;
+
+    if (read_violation || write_violation || execute_violation)
+    {
+        return 0;
+    }
+
+    return 1;
+    
+}
+
+int* get_groups(char* username, int* group_count_address)
+{
+    int user_gid = getpwnam(username) -> pw_gid;
+    int group_count = MAX_GROUP_COUNT;
+    gid_t groups[group_count];
+    getgrouplist(username, user_gid, groups, &group_count);
+    gid_t* reduced_groups = (gid_t*) calloc(group_count, sizeof(gid_t));
+
+    for (int i = 0; i < group_count; i++)
+    {
+        reduced_groups[i] = groups[i];
+    }
+
+    *group_count_address = group_count;
+    
+    return reduced_groups;
+}
+
+int user_is_in_file_group(char* username, char* filename)
+{
+    struct stat st;
+    stat(filename, &st);
+    int file_group_gid = st.st_gid;
+
+    int group_count;
+    gid_t* groups = get_groups(username, &group_count);
+
+    int file_group_member = 0;
+
+    for (int i = 0; i < group_count; i++)
+    {
+        if (file_group_gid == groups[i])
+        {
+            file_group_member = 1;
+            break;
+        }
+    }
+    
+    return file_group_member;
+}
+
+struct named_entity* get_named_entity(struct named_entity** named_entities, int num_named, char* name)
+{
+    struct named_entity* _named_entity = NULL;
+
+    for (int i = 0; i < num_named; i++)
+    {
+        if (strcmp((*(named_entities + i)) -> name, name) == 0)
+        {
+            _named_entity = *(named_entities + i);
+            break;
+        }
+    }
+    
+    return _named_entity;
+}
+
+struct named_entity* get_named_group(struct named_entity** named_groups, int num_groups, char* username)
+{
+    struct named_entity* named_group = NULL;
+    int group_count;
+    gid_t* groups = get_groups(username, &group_count);
+
+    for (int i = 0; i < group_count; i++)
+    {
+        for (int j = 0; j < num_groups; j++)
+        {
+            int user_group_gid = groups[i];
+            int file_group_gid = getgrnam((*(named_groups + j)) -> name) -> gr_gid;
+
+            if (user_group_gid == file_group_gid)
+            {
+                named_group = *(named_groups + j);
+                break;
+            }
+        }
+    }
+    
+    return named_group;
+}
+
+int validate(char* username, char* filename, int permissions)
+{
+    struct acl_data* acl = getacl(filename);
+
+    // if owner
+    if (strcmp(username, acl -> owner) == 0)
+    {
+        return check_permissions(acl -> user_perm, permissions);
+    }
+
+    // if group
+    if (user_is_in_file_group(username, filename))
+    {
+        return check_permissions(acl -> group_perm, permissions);
+    }
+
+    // if named_user
+    struct named_entity* named_user = get_named_entity(acl -> named_users, acl -> num_named_users, username);
+
+    if (!named_user) // equivalent to is named_user is not NULL?
+    {
+        return check_permissions(named_user -> permissions, permissions);
+    }
+
+    // if named_group
+    struct named_entity* named_group = get_named_group(acl -> named_groups, acl -> num_named_groups, username);
+
+    if (!named_group) // equivalent to is named_user not NULL?
+    {
+        return check_permissions(named_group -> permissions, permissions);
+    }
+
+    // if other
+    return check_permissions(acl -> oth_perm, permissions);
 }

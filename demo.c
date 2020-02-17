@@ -48,6 +48,7 @@ int main()
     // TODO handle file not exists (causing segfault)
     // TODO handle pointers in setacl, getacl (make it uniform)
     // TODO free dynamically allocated memory
+    // TODO error/exception handling (like username doesn't exist)
     setacl(a1, "debug_files/sample.txt");
     // printf("hello\n");
     struct acl_data* a2 = getacl("debug_files/sample.txt");
