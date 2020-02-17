@@ -31,6 +31,11 @@ void print_acl_details(struct acl_data* acl)
 
 int main()
 {
+
+    struct acl_data* a3 = getacl("debug_files/here.txt");
+    print_acl_details(a3);
+    return 0;
+
     struct acl_data* a1 = (struct acl_data*) malloc(sizeof(struct acl_data));
     a1 -> owner = "reeshabh";
     a1 -> group = "reeshabh";
