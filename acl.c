@@ -6,6 +6,9 @@
 #include<errno.h>
 #include<stdlib.h>
 #include<string.h>
+#include<sys/stat.h>
+#include<pwd.h>
+#include<grp.h>
 
 // delimiters
 #define MEMBER_DELIMITER '|'
@@ -323,8 +326,58 @@ void setacl(struct acl_data* data, char* filepath)
     write_pair_to_file(filepath, NUM_NAMED_GROUPS_KEY, int_to_string(data -> num_named_groups));
 }
 
+struct acl_data* create_basic_acl(char* filepath)
+{
+    struct acl_data* acl = (struct acl_data*) malloc(sizeof(struct acl_data));
+    struct stat st;
+    stat(filepath, &st);
+    int owner_uid = st.st_uid;
+    int group_gid = st.st_gid;
+    struct passwd* pwd;
+    struct group* grp;
+    pwd = getpwuid(owner_uid);
+    grp = getgrgid(group_gid);
+    char* owner_name = pwd ->pw_name;
+    char* group_name = grp -> gr_name;
+    acl -> owner = owner_name;
+    acl -> group = group_name;
+
+    int owner_read_perm = st.st_mode & S_IRUSR;
+    int owner_write_perm = st.st_mode & S_IWUSR;
+    int owner_exec_perm = st.st_mode & S_IXUSR;
+    
+    int group_read_perm = st.st_mode & S_IRGRP;
+    int group_write_perm = st.st_mode & S_IWGRP;
+    int group_exec_perm = st.st_mode & S_IXGRP;
+
+    int other_read_perm = st.st_mode & S_IROTH;
+    int other_write_perm = st.st_mode & S_IWOTH;
+    int other_exec_perm = st.st_mode & S_IXOTH;
+
+    int owner_perm = 100 * owner_read_perm + 10 * owner_write_perm + owner_exec_perm;
+    int group_perm = 100 * group_read_perm + 10 * group_write_perm + group_exec_perm;
+    int other_perm = 100 * other_read_perm + 10 * other_write_perm + other_exec_perm;
+
+    acl -> user_perm = owner_perm;
+    acl -> group_perm = group_perm;
+    acl -> oth_perm = other_perm;
+    acl -> mask = 777;
+    acl -> num_named_groups = 0;
+    acl -> num_named_users = 0;
+
+    setacl(acl, filepath);
+
+    return acl;
+}
+
 struct acl_data* getacl(char* filepath)
 {
+
+    if (!acl_exists(filepath))
+    {
+        create_basic_acl(filepath);
+    }
+
     struct acl_data* acl = (struct acl_data*) malloc(sizeof(struct acl_data));
     
     char* owner = read_value_from_file(filepath, OWNER_KEY);
@@ -354,3 +407,7 @@ struct acl_data* getacl(char* filepath)
 
 // interface functions
 
+void set_permission(char* filename, int perm_type, char* entity_name, int permission)
+{
+    struct acl_data* acl = getacl(filename);
+}
