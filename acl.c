@@ -99,7 +99,7 @@ int file_exists(char* filepath)
 
 char* setup_key(char* key)
 {
-    char* user_key = (char*) malloc(strlen(key) + 5);
+    char* user_key = (char*) malloc(strlen(key) + 5 + 1); // + 5 for "user." and + 1 for null-termination
     strcpy(user_key, "user.");
     strcat(user_key, key);
     return user_key;
