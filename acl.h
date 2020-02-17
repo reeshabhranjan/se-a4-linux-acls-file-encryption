@@ -51,5 +51,7 @@ struct named_entity** string_to_named_entity_list(char* string, int num_entities
 // interface functions
 void set_permission(char* filename, int perm_type, char* entity_name, int permission);
 int validate(char* username, char* filename, int permissions);
+int strfind(char* hay, char needle);
+char* substring(char* string, int start, int end);
 
 #endif
