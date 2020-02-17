@@ -4,6 +4,8 @@
 #include<string.h>
 #include<stdlib.h>
 #include "acl.h"
+#include<unistd.h>
+#include<pwd.h>
 
 int main(int argc, char* argv[])
 {
@@ -20,6 +22,17 @@ int main(int argc, char* argv[])
     }
 
     char* base_directory_name = argv[1];
+
+    int caller_uid = getuid();
+    struct passwd* pwd = getpwuid(caller_uid);
+    char* caller_username = pwd -> pw_name;
+
+    if (!validate(caller_username, base_directory_name, 100))
+    {
+        perror("You do not have appropriate permissions!");
+        exit(1);
+    }
+
     int n = strlen(base_directory_name);
     if (base_directory_name[n - 2] != '/')
     {
