@@ -347,17 +347,17 @@ struct acl_data* create_basic_acl(char* filepath)
     acl -> owner = owner_name;
     acl -> group = group_name;
 
-    int owner_read_perm = st.st_mode & S_IRUSR;
-    int owner_write_perm = st.st_mode & S_IWUSR;
-    int owner_exec_perm = st.st_mode & S_IXUSR;
+    int owner_read_perm = (st.st_mode & S_IRUSR) != 0;
+    int owner_write_perm = (st.st_mode & S_IWUSR) != 0;
+    int owner_exec_perm = (st.st_mode & S_IXUSR) != 0;
     
-    int group_read_perm = st.st_mode & S_IRGRP;
-    int group_write_perm = st.st_mode & S_IWGRP;
-    int group_exec_perm = st.st_mode & S_IXGRP;
+    int group_read_perm = (st.st_mode & S_IRGRP) != 0;
+    int group_write_perm = (st.st_mode & S_IWGRP) != 0;
+    int group_exec_perm = (st.st_mode & S_IXGRP) != 0;
 
-    int other_read_perm = st.st_mode & S_IROTH;
-    int other_write_perm = st.st_mode & S_IWOTH;
-    int other_exec_perm = st.st_mode & S_IXOTH;
+    int other_read_perm = (st.st_mode & S_IROTH) != 0;
+    int other_write_perm = (st.st_mode & S_IWOTH) != 0;
+    int other_exec_perm = (st.st_mode & S_IXOTH) != 0;
 
     int owner_perm = 100 * owner_read_perm + 10 * owner_write_perm + owner_exec_perm;
     int group_perm = 100 * group_read_perm + 10 * group_write_perm + group_exec_perm;
