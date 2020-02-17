@@ -306,7 +306,7 @@ void setacl(struct acl_data* data, char* filepath)
             break;
         
         case ENODATA:
-            perror("This file does not contain acl structure, creating one now");
+            printf("This file does not contain acl structure, creating one now.\n");
             write_pair_to_file(filepath, ACL_EXISTS_KEY, "Y");
             break;
         

@@ -3,6 +3,8 @@
 #include<unistd.h>
 #include<sys/stat.h>
 #include<sys/wait.h>
+#include<pwd.h>
+#include "acl.h"
 
 int main(int argc, char* argv[])
 {
@@ -21,6 +23,16 @@ int main(int argc, char* argv[])
 
     seteuid(owner_uid);
     printf("Changed euid to %d\n", owner_uid);
+    struct passwd* pwd = getpwuid(owner_uid);
+    char* owner_name = pwd -> pw_name;
+
+    if (!validate(owner_name, filepath, 1))
+    {
+        perror("You do not have sufficient permissions (as owner)!");
+        seteuid(getuid());
+        exit(1);
+    }
+
 
     if (fork() == 0)
     {
@@ -34,6 +46,5 @@ int main(int argc, char* argv[])
         printf("Restored euid to %d\n", getuid());
     }
 
-    
     return 0;
 }

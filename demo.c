@@ -32,8 +32,12 @@ void print_acl_details(struct acl_data* acl)
 int main()
 {
 
-    struct acl_data* a3 = getacl("debug_files/here.txt");
+    struct acl_data* a3 = getacl("debug_files/a2");
+    struct acl_data* a4 = getacl("debug_files");
+    printf("debug_files/a2\n");
     print_acl_details(a3);
+    printf("debug_files/\n");
+    print_acl_details(a4);
     return 0;
 
     struct acl_data* a1 = (struct acl_data*) malloc(sizeof(struct acl_data));

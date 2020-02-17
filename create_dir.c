@@ -5,7 +5,7 @@
 #include<pwd.h>
 #include "acl.h"
 #include<string.h>
-
+#include<grp.h>
 
 int main(int argc, char* argv[])
 {
@@ -67,11 +67,18 @@ int main(int argc, char* argv[])
     }
 
     // TODO set permissions inherited from the parent directory
-    int default_permissions = 777;
+
+    struct acl_data* parent_acl = getacl(parent_directory);
+
+    int default_permissions = 0777; // TODO sync it with acl, remove sticky bit
     int status = mkdir(dir_name, default_permissions);
     if (status == -1)
     {
         perror("Cannot create directory.");
         exit(1);
     }
+
+    setacl(parent_acl, dir_name);
+
+    return 0;
 }

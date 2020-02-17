@@ -1,1 +1,2 @@
 #TODO mask
+#TODO write function flags

@@ -12,11 +12,13 @@ perm:
 	chown root:root myfget
 	chown root:root mycreate_dir
 	chown root:root mydo_exec
+	chown root:root mydemo
 	chmod u+s myls
 	chmod u+s myfput
 	chmod u+s myfget
 	chmod u+s mycreate_dir
 	chmod u+s mydo_exec
+	chmod u+s mydemo
 
 clean:
-	rm ./demo ./myls ./myfput ./myfget ./mycreate_dir ./mydo_exec
+	rm ./mydemo ./myls ./myfput ./myfget ./mycreate_dir ./mydo_exec
