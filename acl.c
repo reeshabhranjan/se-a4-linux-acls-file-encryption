@@ -400,7 +400,7 @@ struct acl_data* getacl(char* filepath)
     acl -> group = group;
     acl -> user_perm = se_acl_user_perm;
     acl -> group_perm = se_acl_group_perm;
-    acl -> oth_perm = se_acl_user_perm;
+    acl -> oth_perm = se_acl_other_perm;
     acl -> mask = se_acl_mask;
     acl -> num_named_users = num_named_users;
     acl -> num_named_groups = num_named_groups;
@@ -495,12 +495,20 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
 
         if (strcmp(entity_name, acl -> owner) == 0)
         {
+            if (DEBUG_MODE)
+            {
+                printf("User is of category: OWNER\n");
+            }
             acl -> user_perm = permission;
             setacl(acl, filename);
         }
         else
         {
             // TODO define this function
+            if (DEBUG_MODE)
+            {
+                printf("User is of category: NAMED_USER\n");
+            }
             update_named_entity_permission(perm_type, filename, acl, entity_name, permission);
         }
         
@@ -511,6 +519,10 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
         
         if (strcmp(entity_name, acl -> group) == 0)
         {
+            if (DEBUG_MODE)
+            {
+                printf("User is of category: GROUP_MEMBER\n");
+            }
             acl -> group_perm = permission;
             setacl(acl, filename);
         }
@@ -518,6 +530,10 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
         else
         {
             // TODO define this function
+            if (DEBUG_MODE)
+            {
+                printf("User is of category: NAMED_GROUP_MEMBER\n");
+            }
             update_named_entity_permission(perm_type, filename, acl, entity_name, permission);
         }
     

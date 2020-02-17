@@ -4,6 +4,31 @@
 #include<string.h>
 #include<stdlib.h>
 
+#define DEBUG_FILE_NAME "debug_files/sample.txt"
+
+void print_acl_details(struct acl_data* acl)
+{
+    printf("owner: %s\n", acl -> owner);
+    printf("group: %s\n", acl -> group);
+    printf("owner_perm: %d\n", acl -> user_perm);
+    printf("group_perm: %d\n", acl -> group_perm);
+    printf("other_perm: %d\n", acl -> oth_perm);
+    struct named_entity** named_users = acl -> named_users;
+    struct named_entity** named_groups = acl -> named_groups;
+    printf("named_users:\n");
+    for (int i = 0; i < acl -> num_named_users; i++)
+    {
+        printf("username: %s permission: %d\n", (*(named_users + i)) -> name, (*(named_users + i)) -> permissions);
+    }
+    printf("\n");
+    printf("named_groups:\n");
+    for (int i = 0; i < acl -> num_named_users; i++)
+    {
+        printf("groupname: %s permission: %d\n", (*(named_groups + i)) -> name, (*(named_groups + i)) -> permissions);
+    }
+    printf("mask: %d\n", acl -> mask);
+}
+
 int main()
 {
     struct acl_data* a1 = (struct acl_data*) malloc(sizeof(struct acl_data));
@@ -49,38 +74,33 @@ int main()
     // TODO handle pointers in setacl, getacl (make it uniform)
     // TODO free dynamically allocated memory
     // TODO error/exception handling (like username doesn't exist)
-    setacl(a1, "debug_files/sample.txt");
-    // printf("hello\n");
-    struct acl_data* a2 = getacl("debug_files/sample.txt");
-    printf("owner: %s\n", a2 -> owner);
-    printf("group: %s\n", a2 -> group);
-    printf("owner_perm: %d\n", a2 -> user_perm);
-    printf("group_perm: %d\n", a2 -> group_perm);
-    printf("other_perm: %d\n", a2 -> oth_perm);
-    printf("named_users:\n");
-    for (int i = 0; i < a2 -> num_named_users; i++)
-    {
-        printf("username: %s permission: %d\n", (*(named_users + i)) -> name, (*(named_users + i)) -> permissions);
-    }
-    for (int i = 0; i < a2 -> num_named_users; i++)
-    {
-        printf("groupname: %s permission: %d\n", (*(named_groups + i)) -> name, (*(named_groups + i)) -> permissions);
-    }
-    printf("mask: %d\n", a2 -> mask);
+    setacl(a1, DEBUG_FILE_NAME);
+    struct acl_data* a2 = getacl(DEBUG_FILE_NAME);
+
     
     // testing validate
     char* username1 = "face";
     int permissions1 = 222;
-    printf("validating %s for %d permissions: %d\n\n", username1, permissions1, validate(username1, "debug_files/sample.txt", permissions1));
+    printf("validating %s for %d permissions: %d\n\n", username1, permissions1, validate(username1, DEBUG_FILE_NAME, permissions1));
     
     char* username2 = "eye";
     int permissions2 = 333;
-    printf("validating %s for %d permissions: %d\n\n", username2, permissions2, validate(username2, "debug_files/sample.txt", permissions2));
+    printf("validating %s for %d permissions: %d\n\n", username2, permissions2, validate(username2, DEBUG_FILE_NAME, permissions2));
     
     char* username3 = "reeshabh";
     int permissions3 = 111;
-    printf("validating %s for %d permissions: %d\n\n", username3, permissions3, validate(username3, "debug_files/sample.txt", permissions3));
+    printf("validating %s for %d permissions: %d\n\n", username3, permissions3, validate(username3, DEBUG_FILE_NAME, permissions3));
 
+    print_acl_details(a2);
+    printf("\n");
+    // testing set_permission
+    int new_permissions = 567;
+    printf("Setting permissions of %s to %d\n", username3, new_permissions);
+    set_permission(DEBUG_FILE_NAME, USER_TYPE, username3, new_permissions);
+
+    struct acl_data* new_acl = getacl(DEBUG_FILE_NAME);
+
+    print_acl_details(new_acl);
 
     
 
