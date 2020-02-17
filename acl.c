@@ -408,13 +408,89 @@ struct acl_data* getacl(char* filepath)
 
 // interface functions
 
+void update_named_entity_permission(int perm_type, char* filename, struct acl_data* acl, char* entity_name, int permission)
+{
+    struct named_entity** named_permissions;
+    int num_named;
+    if (perm_type == USER_TYPE)
+    {
+        named_permissions = acl -> named_users;
+        num_named = acl -> num_named_users;
+    }
+    else if (perm_type == GROUP_TYPE)
+    {
+        named_permissions = acl -> named_groups;
+        num_named = acl -> num_named_groups;
+    }
+
+    struct named_entity** modified_named_permissions;
+
+    int exists = 0;
+
+    for (int i = 0; i < num_named; i++)
+    {
+        if (strcmp((*(named_permissions + i)) -> name, entity_name) == 0)
+        {
+            (*(named_permissions + i)) -> permissions = permission;
+            modified_named_permissions = named_permissions;
+            exists = 1;
+            break;
+        }
+    }
+    
+    if (!exists)
+    {
+        // create a new entry
+        struct named_entity** new_named_permissions = (struct named_entity**) calloc(num_named + 1, sizeof(struct named_entity*));
+
+        for (int i = 0; i < num_named; i++)
+        {
+            *(new_named_permissions + i) = *(named_permissions + i);
+        }
+
+        struct named_entity* new_named_entity = (struct named_entity*) malloc(sizeof(struct named_entity));
+        new_named_entity -> name = entity_name;
+        new_named_entity -> permissions = permission;
+
+        *(new_named_permissions + num_named) = new_named_entity;
+        modified_named_permissions = new_named_permissions;
+
+        if (perm_type == USER_TYPE)
+        {
+            acl -> num_named_users = num_named + 1;
+        }
+
+        else if (perm_type == GROUP_TYPE)
+        {
+            acl -> num_named_groups = num_named + 1;
+        }
+        
+        
+    }
+
+    if (perm_type == USER_TYPE)
+    {
+        acl -> named_users = modified_named_permissions;
+    }
+
+    else if (perm_type == GROUP_TYPE)
+    {
+        acl -> named_groups = modified_named_permissions;
+    }
+
+    setacl(acl, filename);
+    
+}
+
 void set_permission(char* filename, int perm_type, char* entity_name, int permission)
 {
     struct acl_data* acl = getacl(filename);
 
     switch (perm_type)
     {
+
     case USER_TYPE:
+
         if (strcmp(entity_name, acl -> owner) == 0)
         {
             acl -> user_perm = permission;
@@ -423,7 +499,7 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
         else
         {
             // TODO define this function
-            update_named_entity_permission(perm_type, filename, acl, entity_name);
+            update_named_entity_permission(perm_type, filename, acl, entity_name, permission);
         }
         
         break;
@@ -439,14 +515,13 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
         else
         {
             // TODO define this function
-            update_named_entity_permission(perm_type, filename, acl, entity_name);
+            update_named_entity_permission(perm_type, filename, acl, entity_name, permission);
         }
-        
-
+    
         break;
     
     default:
-        perror("Incorrect perm_type.");
+        perror("Incorrect perm_type provided.");
         exit(1);
     }
 }
