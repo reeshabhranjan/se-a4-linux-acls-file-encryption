@@ -490,9 +490,9 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
 {
     struct acl_data* acl = getacl(filename);
 
+    // when username is specified
     if (perm_type == USER_TYPE)
     {
-
         if (strcmp(entity_name, acl -> owner) == 0)
         {
             if (DEBUG_MODE)
@@ -512,6 +512,17 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
             update_named_entity_permission(perm_type, filename, acl, entity_name, permission);
         }
         
+    }
+
+    // when username is not specified
+    else if (perm_type == OTHER_TYPE)
+    {
+        if (DEBUG_MODE)
+        {
+            printf("User is of category: OTHER\n");
+        }
+        acl -> oth_perm = permission;
+        setacl(acl, filename);
     }
 
     else if (perm_type == GROUP_TYPE)

@@ -97,6 +97,19 @@ int main()
     int new_permissions = 567;
     printf("Setting permissions of %s to %d\n", username3, new_permissions);
     set_permission(DEBUG_FILE_NAME, USER_TYPE, username3, new_permissions);
+    
+    new_permissions = 696;
+    printf("Setting permissions of %s to %d\n", "others", new_permissions);
+    set_permission(DEBUG_FILE_NAME, OTHER_TYPE, NULL, new_permissions);
+    
+    new_permissions = 404;
+    char* groupname1 = "krypton";
+    printf("Setting permissions of %s to %d\n", groupname1, new_permissions);
+    set_permission(DEBUG_FILE_NAME, GROUP_TYPE, groupname1, new_permissions);
+
+    new_permissions = 717;
+    printf("Setting permissions of %s to %d\n", username2, new_permissions);
+    set_permission(DEBUG_FILE_NAME, USER_TYPE, username2, new_permissions);
 
     struct acl_data* new_acl = getacl(DEBUG_FILE_NAME);
 
