@@ -656,7 +656,7 @@ int validate(char* username, char* filename, int permissions)
     // if named_user
     struct named_entity* named_user = get_named_entity(acl -> named_users, acl -> num_named_users, username);
 
-    if (!named_user) // equivalent to is named_user is not NULL?
+    if (named_user) // equivalent to is named_user is not NULL?
     {
         return check_permissions(named_user -> permissions, permissions);
     }
@@ -664,7 +664,7 @@ int validate(char* username, char* filename, int permissions)
     // if named_group
     struct named_entity* named_group = get_named_group(acl -> named_groups, acl -> num_named_groups, username);
 
-    if (!named_group) // equivalent to is named_user not NULL?
+    if (named_group) // equivalent to is named_user not NULL?
     {
         return check_permissions(named_group -> permissions, permissions);
     }
