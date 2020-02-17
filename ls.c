@@ -65,4 +65,6 @@ int main(int argc, char* argv[])
             strcat(file_full_name, sub_entry -> d_name);
         }
     }
+
+    return 0;
 }

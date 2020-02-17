@@ -2,6 +2,7 @@ build:
 	gcc -o demo demo.c acl.c
 	gcc -o ls ls.c acl.c
 	gcc -o myfputs fput.c acl.c
+	gcc -o myfgets fget.c acl.c
 run:
 	gcc -o demo demo.c acl.c
 	./demo
