@@ -2,3 +2,4 @@
 #TODO write function flags
 #TODO print euid before and after
 #TODO documentation
+#TODO fix size in myls

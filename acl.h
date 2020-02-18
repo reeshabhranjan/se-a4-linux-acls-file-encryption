@@ -53,5 +53,6 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
 int validate(char* username, char* filename, int permissions);
 int strfind(char* hay, char needle);
 char* substring(char* string, int start, int end);
+int file_exists(char* filename);
 
 #endif
