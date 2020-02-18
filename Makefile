@@ -1,12 +1,12 @@
 build:
-	gcc -g -o mydemo demo.c acl.c
-	gcc -g -o myls ls.c acl.c
-	gcc -g -o myfput fput.c acl.c
-	gcc -g -o myfget fget.c acl.c
-	gcc -g -o mycreate_dir create_dir.c acl.c
-	gcc -g -o mydo_exec do_exec.c acl.c
-	gcc -g -o getacl getacl.c acl.c
-	gcc -g -o setacl setacl.c acl.c
+	gcc -g -o mydemo demo.c acl.c security.c
+	gcc -g -o myls ls.c acl.c security.c
+	gcc -g -o myfput fput.c acl.c security.c
+	gcc -g -o myfget fget.c acl.c security.c
+	gcc -g -o mycreate_dir create_dir.c acl.c security.c
+	gcc -g -o mydo_exec do_exec.c acl.c security.c
+	gcc -g -o getacl getacl.c acl.c security.c
+	gcc -g -o setacl setacl.c acl.c security.c
 
 perm:
 	chown root:root myls

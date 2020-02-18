@@ -6,6 +6,7 @@
 #include "acl.h"
 #include<unistd.h>
 #include<pwd.h>
+#include "security.h"
 
 int main(int argc, char* argv[])
 {
@@ -22,6 +23,12 @@ int main(int argc, char* argv[])
     }
 
     char* base_directory_name = argv[1];
+
+    if (!file_exists(base_directory_name))
+    {
+        perror("The directory does not exist.");
+        exit(1);
+    }
 
     int caller_uid = getuid();
     struct passwd* pwd = getpwuid(caller_uid);

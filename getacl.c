@@ -4,6 +4,7 @@
 #include<pwd.h>
 #include "acl.h"
 #include<string.h>
+#include "security.h"
 
 void print_acl_details(struct acl_data* acl)
 {
@@ -47,6 +48,12 @@ int main(int argc, char* argv[])
     }
 
     char* filename = argv[1];
+
+    if (!file_exists(filename))
+    {
+        perror("The file does not exist.");
+        exit(1);
+    }    
 
     struct acl_data* acl = getacl(filename);
 

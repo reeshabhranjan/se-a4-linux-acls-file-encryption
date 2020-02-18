@@ -6,6 +6,7 @@
 #include "acl.h"
 #include<string.h>
 #include<grp.h>
+#include "security.h"
 
 int main(int argc, char* argv[])
 {
@@ -55,6 +56,17 @@ int main(int argc, char* argv[])
         parent_directory = ".";
     }
 
+    if (!file_exists(parent_directory))
+    {
+        perror("Invalid path.");
+        exit(1);
+    }
+
+    if (!is_directory(parent_directory))
+    {
+        perror("Path does not lead to a valid directory.");
+        exit(1);
+    }
 
     int caller_uid = getuid();
     struct passwd* pwd = getpwuid(caller_uid);

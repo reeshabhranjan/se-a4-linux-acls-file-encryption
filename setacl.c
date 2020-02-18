@@ -18,6 +18,12 @@ int main(int argc, char* argv[])
     char* body = argv[2];
     char* filepath = argv[3];
 
+    if (!file_exists(filepath))
+    {
+        perror("The file does not exist.");
+        exit(1);
+    }
+
     char mode_char = body[0];
 
     int colon_index_1 = 1;

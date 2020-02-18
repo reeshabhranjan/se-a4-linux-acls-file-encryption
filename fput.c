@@ -7,6 +7,7 @@
 #include<string.h>
 #include<pwd.h>
 #include "acl.h"
+#include "security.h"
 
 int main(int argc, char* argv[])
 {
@@ -24,6 +25,18 @@ int main(int argc, char* argv[])
     }
 
     char* filepath = argv[1];
+
+    if (!file_exists(filepath))
+    {
+        perror("The file does not exist.");
+        exit(1);
+    }
+
+    if (!is_file(filepath))
+    {
+        perror("The file is not a regular file.");
+        exit(1);
+    }
 
     int caller_uid = getuid();
     struct passwd* pwd = getpwuid(caller_uid);

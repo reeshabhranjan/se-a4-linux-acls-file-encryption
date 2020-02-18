@@ -3,3 +3,4 @@
 #TODO print euid before and after
 #TODO documentation
 #TODO fix size in myls
+#TODO free()

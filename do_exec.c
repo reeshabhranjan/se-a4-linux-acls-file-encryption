@@ -5,6 +5,7 @@
 #include<sys/wait.h>
 #include<pwd.h>
 #include "acl.h"
+#include "security.h"
 
 int main(int argc, char* argv[])
 {
@@ -16,6 +17,19 @@ int main(int argc, char* argv[])
 
     int saved_euid = geteuid();
     char* filepath = argv[1];
+
+    if (!file_exists(filepath))
+    {
+        perror("The file does not exist.");
+        exit(1);
+    }
+
+    if (!is_file(filepath))
+    {
+        perror("The file is not a regular file.");
+        exit(1);
+    }
+
     struct stat st;
     stat(filepath, &st);
 
