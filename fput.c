@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    printf("Enter a string (under 100 characters)\n");
+    printf("Enter a string (under 100000 characters)\n");
     char s[100000];
     fgets(s, 100000, stdin);
 

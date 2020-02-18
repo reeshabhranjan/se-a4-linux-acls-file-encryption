@@ -1,4 +1,4 @@
-#TODO mask
+#TODO mask [OK]
 #TODO write function flags
 #TODO print euid before and after
 #TODO documentation
