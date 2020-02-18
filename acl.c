@@ -549,6 +549,12 @@ void set_permission(char* filename, int perm_type, char* entity_name, int permis
         }
     
     }
+
+    else if (perm_type == MASK_TYPE)
+    {
+        acl -> mask = permission;
+        setacl(acl, filename);
+    }
     
     else
     {
