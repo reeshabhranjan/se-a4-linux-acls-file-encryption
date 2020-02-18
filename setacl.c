@@ -53,11 +53,10 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    struct stat st;
-    stat(filepath, &st);
-    int file_owner_uid = st.st_uid;
+    char* owner_name = getacl(filepath) -> owner;
+    int file_owner_uid = getpwnam(owner_name) -> pw_uid;
 
-    int allowed = getuid() == 0 || geteuid() == 0 || getuid() == file_owner_uid || geteuid() == file_owner_uid;
+    int allowed = getuid() == 0 || getuid() == file_owner_uid || geteuid() == file_owner_uid;
 
     if (!allowed)
     {

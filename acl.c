@@ -611,9 +611,9 @@ int* get_groups(char* username, int* group_count_address)
 
 int user_is_in_file_group(char* username, char* filename)
 {
-    struct stat st;
-    stat(filename, &st);
-    int file_group_gid = st.st_gid;
+    char* file_group_name = getacl(filename) -> group;
+    struct group* grp = getgrnam(file_group_name);
+    int file_group_gid = grp -> gr_gid;
 
     int group_count;
     gid_t* groups = get_groups(username, &group_count);

@@ -2,5 +2,7 @@
 #TODO write function flags
 #TODO print euid before and after
 #TODO documentation
-#TODO fix size in myls
-#TODO free()
+#TODO fix size in myls [OK]
+#TODO free() [OK]
+#TODO replace DAC with custom ACL (like getting owner/group name)
+#TODO add assumption that I am storing owner and group in acl
