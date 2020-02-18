@@ -30,6 +30,12 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    if (!is_directory(base_directory_name))
+    {
+        perror("The input path does not point to a directory.");
+        exit(1);
+    }
+
     int caller_uid = getuid();
     struct passwd* pwd = getpwuid(caller_uid);
     char* caller_username = pwd -> pw_name;

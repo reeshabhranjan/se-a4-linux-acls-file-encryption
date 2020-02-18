@@ -1,5 +1,4 @@
 build:
-	gcc -g -o mydemo demo.c acl.c security.c
 	gcc -g -o myls ls.c acl.c security.c
 	gcc -g -o myfput fput.c acl.c security.c
 	gcc -g -o myfget fget.c acl.c security.c
@@ -14,7 +13,6 @@ perm:
 	chown root:root myfget
 	chown root:root mycreate_dir
 	chown root:root mydo_exec
-	chown root:root mydemo
 	chown root:root getacl
 	chown root:root setacl
 	chmod u+s myls
@@ -22,9 +20,8 @@ perm:
 	chmod u+s myfget
 	chmod u+s mycreate_dir
 	chmod u+s mydo_exec
-	chmod u+s mydemo
 	chmod u+s getacl
 	chmod u+s setacl
 
 clean:
-	rm ./mydemo ./myls ./myfput ./myfget ./mycreate_dir ./mydo_exec ./getacl ./setacl
+	rm ./myls ./myfput ./myfget ./mycreate_dir ./mydo_exec ./getacl ./setacl
