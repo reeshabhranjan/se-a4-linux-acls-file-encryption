@@ -672,6 +672,24 @@ struct named_entity* get_named_group(struct named_entity** named_groups, int num
     return named_group;
 }
 
+int mask_permission(int permission, int mask)
+{
+    int read_permission = permission / 100;
+    permission -= read_permission * 100;
+    int write_permission = permission / 10;
+    permission -= write_permission * 10;
+    int execute_permission = permission;
+
+    int mask_read = mask / 100;
+    mask -= mask_read * 100;
+    int mask_write = mask / 10;
+    mask -= mask_write * 10;
+    int mask_execute = mask;
+
+    int masked_permission = 100 * (read_permission * mask_read) + 10 * (write_permission * mask_write) + (execute_permission * mask_execute);
+    return masked_permission;
+}
+
 int validate(char* username, char* filename, int permissions)
 {
     struct acl_data* acl = getacl(filename);
@@ -693,7 +711,8 @@ int validate(char* username, char* filename, int permissions)
         {
             printf("User lies in the category: GROUP_MEMBER\n");
         }
-        return check_permissions(acl -> group_perm, permissions);
+
+        return check_permissions(mask_permission(acl -> group_perm, acl -> mask), permissions);
     }
 
     // if named_user
@@ -705,7 +724,7 @@ int validate(char* username, char* filename, int permissions)
         {
             printf("User lies in the category: NAMED_USER\n");
         }
-        return check_permissions(named_user -> permissions, permissions);
+        return check_permissions(mask_permission(named_user -> permissions, acl -> mask), permissions);
     }
 
     // if named_group
@@ -717,7 +736,7 @@ int validate(char* username, char* filename, int permissions)
         {
             printf("User lies in the category: NAMED_GROUP_MEMBER\n");
         }
-        return check_permissions(named_group -> permissions, permissions);
+        return check_permissions(mask_permission(named_group -> permissions, acl -> mask), permissions);
     }
 
     // if other
@@ -725,5 +744,5 @@ int validate(char* username, char* filename, int permissions)
     {
         printf("User lies in the category: OTHER\n");
     }
-    return check_permissions(acl -> oth_perm, permissions);
+    return check_permissions(mask_permission(acl -> oth_perm, acl -> mask), permissions);
 }
