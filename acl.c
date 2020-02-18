@@ -366,7 +366,7 @@ struct acl_data* create_basic_acl(char* filepath)
     acl -> user_perm = owner_perm;
     acl -> group_perm = group_perm;
     acl -> oth_perm = other_perm;
-    acl -> mask = 777;
+    acl -> mask = 111;
     acl -> num_named_groups = 0;
     acl -> num_named_users = 0;
 
