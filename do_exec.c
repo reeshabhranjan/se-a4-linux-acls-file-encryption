@@ -19,12 +19,14 @@ int main(int argc, char* argv[])
     struct stat st;
     stat(filepath, &st);
 
-    int owner_uid = st.st_uid;
+    struct acl_data* acl = getacl(filepath);
+    char* owner_name = acl -> owner;
+    struct passwd* pwd = getpwnam(owner_name);
+
+    int owner_uid = pwd -> pw_uid;
 
     seteuid(owner_uid);
     printf("Changed euid to %d\n", owner_uid);
-    struct passwd* pwd = getpwuid(owner_uid);
-    char* owner_name = pwd -> pw_name;
 
     if (!validate(owner_name, filepath, 1))
     {
