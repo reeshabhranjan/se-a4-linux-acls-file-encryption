@@ -54,5 +54,6 @@ int validate(char* username, char* filename, int permissions);
 int strfind(char* hay, char needle);
 char* substring(char* string, int start, int end);
 int file_exists(char* filename);
+char* int_to_string(int x);
 
 #endif

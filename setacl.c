@@ -4,6 +4,7 @@
 #include<pwd.h>
 #include "acl.h"
 #include<string.h>
+#include "security.h"
 
 int main(int argc, char* argv[])
 {
@@ -30,13 +31,26 @@ int main(int argc, char* argv[])
     int colon_index_2 = colon_index_1 + 1 + strfind(body + colon_index_1 + 1, ':');
 
     char* name = substring(body, colon_index_1 + 1, colon_index_2);
+
     char* permission_string = substring(body, colon_index_2 + 1, strlen(body));
+
+    if (strlen(permission_string) > 3)
+    {
+        perror("Improper permissions.");
+        exit(1);
+    }
 
     int read_permission = strfind(permission_string, 'r') != -1;
     int write_permission = strfind(permission_string, 'w') != -1;
     int execute_permission = strfind(permission_string, 'x') != -1;
 
     int permissions = 100 * read_permission + 10 * write_permission + execute_permission;
+
+    if (!is_valid_permission(permissions))
+    {
+        perror("Improper permissions");
+        exit(1);
+    }
 
     switch (mode_char)
     {
@@ -47,11 +61,21 @@ int main(int argc, char* argv[])
         }
         else
         {
+            if (!username_exists(name))
+            {
+                perror("The username does not exist.");
+                exit(1);
+            }
             set_permission(filepath, USER_TYPE, name, permissions);
         }
         
         break;
     case 'g':
+        if (!groupname_exists(name))
+        {
+            perror("The group-name does not exist.");
+            exit(1);
+        }
         set_permission(filepath, GROUP_TYPE, name, permissions);
         break;
     case 'm':
