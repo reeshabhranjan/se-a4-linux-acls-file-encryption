@@ -5,6 +5,7 @@
 #include "acl.h"
 #include<string.h>
 #include "security.h"
+#include<sys/stat.h>
 
 int main(int argc, char* argv[])
 {
@@ -49,6 +50,18 @@ int main(int argc, char* argv[])
     if (!is_valid_permission(permissions))
     {
         perror("Improper permissions");
+        exit(1);
+    }
+
+    struct stat st;
+    stat(filepath, &st);
+    int file_owner_uid = st.st_uid;
+
+    int allowed = getuid() == 0 || geteuid() == 0 || getuid() == file_owner_uid || geteuid() == file_owner_uid;
+
+    if (!allowed)
+    {
+        perror("Permission denied: Only root and owner of the file can modify acl-permissions.");
         exit(1);
     }
 
