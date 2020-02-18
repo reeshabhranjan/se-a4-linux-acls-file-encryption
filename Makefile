@@ -27,4 +27,4 @@ perm:
 	chmod u+s setacl
 
 clean:
-	rm ./mydemo ./myls ./myfput ./myfget ./mycreate_dir ./mydo_exec
+	rm ./mydemo ./myls ./myfput ./myfget ./mycreate_dir ./mydo_exec ./getacl ./setacl
