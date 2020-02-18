@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
     {
         printf("Incorrect arguments.\n");
         printf("./setacl -m <u/g/m>:<username/groupname/leave_empty_for_mask_or_other>:<permission> <filepath>\n");
+        exit(1);
     }
 
     char* flag = argv[1];
@@ -25,9 +26,9 @@ int main(int argc, char* argv[])
     char* name = substring(body, colon_index_1 + 1, colon_index_2);
     char* permission_string = substring(body, colon_index_2 + 1, strlen(body));
 
-    int read_permission = strfind(permission_string, 'r');
-    int write_permission = strfind(permission_string, 'w');
-    int execute_permission = strfind(permission_string, 'x');
+    int read_permission = strfind(permission_string, 'r') != -1;
+    int write_permission = strfind(permission_string, 'w') != -1;
+    int execute_permission = strfind(permission_string, 'x') != -1;
 
     int permissions = 100 * read_permission + 10 * write_permission + execute_permission;
 

@@ -22,7 +22,7 @@ void print_acl_details(struct acl_data* acl)
     }
     printf("\n");
     printf("named_groups:\n");
-    for (int i = 0; i < acl -> num_named_users; i++)
+    for (int i = 0; i < acl -> num_named_groups; i++)
     {
         printf("groupname: %s permission: %d\n", (*(named_groups + i)) -> name, (*(named_groups + i)) -> permissions);
     }
