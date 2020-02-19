@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
     setacl(parent_acl, dir_name);
 
     seteuid(getuid());
-    printf("UID: %D EUID: %d\n", getuid(), geteuid());
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
 
     return 0;
 }
