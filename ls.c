@@ -39,7 +39,8 @@ int main(int argc, char* argv[])
     int caller_uid = getuid();
     struct passwd* pwd = (struct passwd*) malloc(sizeof(struct passwd));
     *pwd = *(getpwuid(caller_uid));
-    char* caller_username = pwd -> pw_name;
+    char* caller_username = (char*) malloc(strlen(pwd -> pw_name) + 1);
+    strcpy(caller_username, pwd -> pw_name);
 
     if (!validate(caller_username, base_directory_name, 100))
     {

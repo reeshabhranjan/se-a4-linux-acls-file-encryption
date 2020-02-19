@@ -342,8 +342,10 @@ struct acl_data* create_basic_acl(char* filepath)
     struct group* grp = (struct group*) malloc(sizeof(struct group));
     *pwd = *(getpwuid(owner_uid));
     *grp = *(getgrgid(group_gid));
-    char* owner_name = pwd ->pw_name;
-    char* group_name = grp -> gr_name;
+    char* owner_name = (char*) malloc(strlen(pwd -> pw_name) + 1);
+    strcpy(owner_name, pwd -> pw_name);
+    char* group_name = (char*) malloc(strlen(grp -> gr_name) + 1);
+    strcpy(group_name, grp -> gr_name);
     acl -> owner = owner_name;
     acl -> group = group_name;
 

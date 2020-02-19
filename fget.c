@@ -5,6 +5,7 @@
 #include<pwd.h>
 #include "acl.h"
 #include "security.h"
+#include<string.h>
 
 int main(int argc, char* argv[])
 {
@@ -37,7 +38,8 @@ int main(int argc, char* argv[])
     int caller_uid = getuid();
     struct passwd* pwd = (struct passwd*) malloc(sizeof(struct passwd));
     *pwd = *(getpwuid(caller_uid));
-    char* caller_name = pwd -> pw_name;
+    char* caller_name = (char*) malloc(strlen(pwd -> pw_name) + 1);
+    strcpy(caller_name, pwd -> pw_name);
 
     if (!validate(caller_name, filepath, 100))
     {
