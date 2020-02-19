@@ -338,10 +338,10 @@ struct acl_data* create_basic_acl(char* filepath)
     stat(filepath, &st);
     int owner_uid = st.st_uid;
     int group_gid = st.st_gid;
-    struct passwd* pwd;
-    struct group* grp;
-    pwd = getpwuid(owner_uid);
-    grp = getgrgid(group_gid);
+    struct passwd* pwd = (struct passwd*) malloc(sizeof(struct passwd));
+    struct group* grp = (struct group*) malloc(sizeof(struct group));
+    *pwd = *(getpwuid(owner_uid));
+    *grp = *(getgrgid(group_gid));
     char* owner_name = pwd ->pw_name;
     char* group_name = grp -> gr_name;
     acl -> owner = owner_name;
@@ -612,7 +612,8 @@ int* get_groups(char* username, int* group_count_address)
 int user_is_in_file_group(char* username, char* filename)
 {
     char* file_group_name = getacl(filename) -> group;
-    struct group* grp = getgrnam(file_group_name);
+    struct group* grp = (struct group*) malloc(sizeof(struct group));
+    *grp = *(getgrnam(file_group_name));
     int file_group_gid = grp -> gr_gid;
 
     int group_count;

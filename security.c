@@ -9,13 +9,15 @@
 
 int username_exists(char* username)
 {
-    struct passwd* pwd = getpwnam(username);
+    struct passwd* pwd = (struct passwd*) malloc(sizeof(struct passwd));
+    *pwd = *(getpwnam(username));
     return pwd != NULL;
 }
 
 int groupname_exists(char* groupname)
 {
-    struct group* grp = getgrnam(groupname);
+    struct group* grp = (struct group*) malloc(sizeof(struct group));
+    *grp = *(getgrnam(groupname));
     return grp != NULL;
 }
 

@@ -35,7 +35,8 @@ int main(int argc, char* argv[])
 
     struct acl_data* acl = getacl(filepath);
     char* owner_name = acl -> owner;
-    struct passwd* pwd = getpwnam(owner_name);
+    struct passwd* pwd = (struct passwd*) malloc(sizeof(struct passwd));
+    *pwd = *(getpwnam(owner_name));
 
     int owner_uid = pwd -> pw_uid;
 
