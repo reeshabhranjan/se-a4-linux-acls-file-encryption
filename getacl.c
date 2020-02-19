@@ -47,6 +47,8 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
+
     char* filename = argv[1];
 
     if (!file_exists(filename))
@@ -58,6 +60,9 @@ int main(int argc, char* argv[])
     struct acl_data* acl = getacl(filename);
 
     print_acl_details(acl);
+
+    seteuid(getuid());
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
     
     return 0;
 }

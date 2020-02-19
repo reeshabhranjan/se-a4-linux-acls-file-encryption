@@ -64,6 +64,8 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
+
     switch (mode_char)
     {
     case 'u':
@@ -97,6 +99,9 @@ int main(int argc, char* argv[])
     default:
         break;
     }
+
+    seteuid(getuid());
+    printf("UID: %d EUID: %d", getuid(), geteuid());
 
     return 0;
 }

@@ -50,6 +50,8 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
+
     printf("Enter a string (under 100000 characters)\n");
     char s[100000];
     fgets(s, 100000, stdin);
@@ -59,5 +61,9 @@ int main(int argc, char* argv[])
     int fd = open(filepath, O_WRONLY | O_APPEND | O_CREAT);
     write(fd, s, len_s);
     close(fd);
+
+    seteuid(getuid());
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
+
     return 0;
 }

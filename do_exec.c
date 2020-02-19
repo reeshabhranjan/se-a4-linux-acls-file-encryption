@@ -43,6 +43,8 @@ int main(int argc, char* argv[])
     seteuid(owner_uid);
     printf("Changed euid to %d\n", owner_uid);
 
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
+
     if (!validate(owner_name, filepath, 1))
     {
         perror("You do not have sufficient permissions (as owner)!");
@@ -62,6 +64,8 @@ int main(int argc, char* argv[])
         seteuid(getuid());
         printf("Restored euid to %d\n", getuid());
     }
+
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
 
     return 0;
 }

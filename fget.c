@@ -47,12 +47,17 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
+
     char buf[10000];
 
     int fd = open(filepath, O_RDONLY);
     read(fd, buf, 10000);
 
     printf("%s", buf);
+
+    seteuid(getuid());
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
     
     return 0;
 }

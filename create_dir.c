@@ -80,6 +80,8 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
+
     // TODO set permissions inherited from the parent directory
 
     struct acl_data* parent_acl = getacl(parent_directory);
@@ -93,6 +95,9 @@ int main(int argc, char* argv[])
     }
 
     setacl(parent_acl, dir_name);
+
+    seteuid(getuid());
+    printf("UID: %D EUID: %d\n", getuid(), geteuid());
 
     return 0;
 }

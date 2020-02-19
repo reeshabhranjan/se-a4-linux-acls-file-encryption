@@ -48,6 +48,7 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
     int n = strlen(base_directory_name);
     if (base_directory_name[n - 2] != '/')
     {
@@ -78,7 +79,7 @@ int main(int argc, char* argv[])
         fclose(file);
 
         // TODO fix file-size
-        printf("file: %-15s owner: %-10s (%-3d) group: %-10s (%-3d) others: (%-3d) size: (%-10lu)\n", sub_entry -> d_name, acl -> owner, acl -> user_perm, acl -> group, acl -> group_perm, acl -> oth_perm, st.st_size);
+        printf("file: %-15s owner: %-10s (%-3d) group: %-10s (%-3d) others: (%-3d) size: %-10lu\n", sub_entry -> d_name, acl -> owner, acl -> user_perm, acl -> group, acl -> group_perm, acl -> oth_perm, st.st_size);
 
         sub_entry = readdir(base_directory);
 
@@ -93,6 +94,9 @@ int main(int argc, char* argv[])
             strcat(file_full_name, sub_entry -> d_name);
         }
     }
+
+    seteuid(getuid());
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
 
     return 0;
 }
