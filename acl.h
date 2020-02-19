@@ -55,5 +55,6 @@ int strfind(char* hay, char needle);
 char* substring(char* string, int start, int end);
 int file_exists(char* filename);
 char* int_to_string(int x);
+void change_owner(char* filename, int perm_type, char* entity_name);
 
 #endif

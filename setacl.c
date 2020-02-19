@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 
     char* name = substring(body, colon_index_1 + 1, colon_index_2);
 
-    char* permission_string = substring(body, colon_index_2 + 1, strlen(body));
+    char* permission_string = colon_index_2 + 1 < strlen(body) ? substring(body, colon_index_2 + 1, strlen(body)) : "";
 
     if (strlen(permission_string) > 3)
     {
@@ -66,38 +66,68 @@ int main(int argc, char* argv[])
 
     printf("UID: %d EUID: %d\n", getuid(), geteuid());
 
-    switch (mode_char)
+    if (strcmp(flag, "-m") == 0)
     {
-    case 'u':
-        if (strlen(name) == 0)
+        switch (mode_char)
         {
-            set_permission(filepath, OTHER_TYPE, name, permissions);
-        }
-        else
-        {
-            if (!username_exists(name))
+        case 'u':
+            if (strlen(name) == 0)
             {
-                perror("The username does not exist.");
+                set_permission(filepath, OTHER_TYPE, name, permissions);
+            }
+            else
+            {
+                if (!username_exists(name))
+                {
+                    perror("The username does not exist.");
+                    exit(1);
+                }
+                set_permission(filepath, USER_TYPE, name, permissions);
+            }
+            
+            break;
+        case 'g':
+            if (!groupname_exists(name))
+            {
+                perror("The group-name does not exist.");
                 exit(1);
             }
-            set_permission(filepath, USER_TYPE, name, permissions);
-        }
+            set_permission(filepath, GROUP_TYPE, name, permissions);
+            break;
+        case 'm':
+            set_permission(filepath, MASK_TYPE, name, permissions);
+            break;
         
-        break;
-    case 'g':
-        if (!groupname_exists(name))
-        {
-            perror("The group-name does not exist.");
-            exit(1);
+        default:
+            printf("Invalid combination\n");
+            break;
         }
-        set_permission(filepath, GROUP_TYPE, name, permissions);
-        break;
-    case 'm':
-        set_permission(filepath, MASK_TYPE, name, permissions);
-        break;
-    
-    default:
-        break;
+    }
+
+    else if (strcmp(flag, "-o") == 0)
+    {
+        switch(mode_char)
+        {
+            case 'u':
+                if (!username_exists(name))
+                {
+                    perror("No such username.");
+                    exit(1);
+                }
+                change_owner(filepath, USER_TYPE, name);
+                break;
+            case 'g':
+                if (!groupname_exists(name))
+                {
+                    perror("No such group-name.");
+                    exit(1);
+                }
+                change_owner(filepath, GROUP_TYPE, name);
+                break;
+            default:
+                printf("Invalid combination of arguments.\n");
+                break;
+        }
     }
 
     seteuid(getuid());

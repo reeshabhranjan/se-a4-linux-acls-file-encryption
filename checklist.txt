@@ -6,3 +6,5 @@
 #TODO free() [OK]
 #TODO replace DAC with custom ACL (like getting owner/group name) [OK]
 #TODO add assumption that I am storing owner and group in acl [OK]
+#TODO assumption in fget, fput for limits
+#TODO print type of file in ls?

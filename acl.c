@@ -749,3 +749,19 @@ int validate(char* username, char* filename, int permissions)
     }
     return check_permissions(mask_permission(acl -> oth_perm, acl -> mask), permissions);
 }
+
+void change_owner(char* filename, int perm_type, char* entity_name)
+{
+    struct acl_data* acl = getacl(filename);
+
+    if (perm_type == USER_TYPE)
+    {
+        acl -> owner = entity_name;
+    }
+    else if (perm_type == GROUP_TYPE)
+    {
+        acl -> group = entity_name;
+    }
+
+    setacl(acl, filename);
+}
