@@ -41,7 +41,6 @@ int main(int argc, char* argv[])
     int owner_uid = pwd -> pw_uid;
 
     seteuid(owner_uid);
-    printf("Changed euid to %d\n", owner_uid);
 
     printf("UID: %d EUID: %d\n", getuid(), geteuid());
 
@@ -56,16 +55,19 @@ int main(int argc, char* argv[])
     if (fork() == 0)
     {
         execv(filepath, argv + 1);
+        perror("Invalid executable path.");
+        seteuid(getuid());
+        printf("[CHILD]: UID: %d EUID: %d\n", getuid(), geteuid());
+        exit(1);
     }
 
     else
     {
         wait(NULL);
         seteuid(getuid());
-        printf("Restored euid to %d\n", getuid());
     }
 
-    printf("UID: %d EUID: %d\n", getuid(), geteuid());
+    printf("[PARENT]: UID: %d EUID: %d\n", getuid(), geteuid());
 
     return 0;
 }

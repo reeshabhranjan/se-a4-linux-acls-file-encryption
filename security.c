@@ -59,4 +59,4 @@ int is_valid_permission(int permission)
     return 1;
 }
 
-// file_exits already defined in acl.h
+// file_exists already defined in acl.h

@@ -8,3 +8,4 @@
 #TODO add assumption that I am storing owner and group in acl [OK]
 #TODO assumption in fget, fput for limits
 #TODO print type of file in ls?
+#TODO describe order of permission checking
