@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
     }
 
     seteuid(getuid());
-    printf("UID: %d EUID: %d", getuid(), geteuid());
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
 
     return 0;
 }
