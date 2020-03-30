@@ -2,6 +2,6 @@
 #define ENCRYPT_H
 
 // interface function
-void generate_key_iv(char* passphrase, char** key, char** iv);
+void generate_key_iv(char** key, char** iv);
 
 #endif

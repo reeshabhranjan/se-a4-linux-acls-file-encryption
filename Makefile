@@ -6,7 +6,7 @@ build:
 	gcc -g -o files/mydo_exec do_exec.c acl.c security.c
 	gcc -g -o files/getacl getacl.c acl.c security.c
 	gcc -g -o files/setacl setacl.c acl.c security.c
-	gcc -g -o files/testing testing.c acl.c security.c crypto.c
+	gcc -g -o files/testing testing.c acl.c security.c encrypt.c -lcrypto
 
 setup:
 	apt install libssl-dev
