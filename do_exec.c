@@ -1,9 +1,9 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
-#include<sys/stat.h>
-#include<sys/wait.h>
-#include<pwd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <pwd.h>
 #include "acl.h"
 #include "security.h"
 
@@ -40,10 +40,11 @@ int main(int argc, char* argv[])
 
     int owner_uid = pwd -> pw_uid;
 
-    seteuid(owner_uid);
+    seteuid(owner_uid); // TODO use setuid() here
 
     printf("UID: %d EUID: %d\n", getuid(), geteuid());
 
+    // TODO also check for permissions of the caller
     if (!validate(owner_name, filepath, 1))
     {
         perror("You do not have sufficient permissions (as owner)!");

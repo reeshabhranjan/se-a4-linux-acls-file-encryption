@@ -1,11 +1,11 @@
-#include<stdio.h>
-#include<dirent.h>
-#include<sys/stat.h>
-#include<string.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <dirent.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <stdlib.h>
 #include "acl.h"
-#include<unistd.h>
-#include<pwd.h>
+#include <unistd.h>
+#include <pwd.h>
 #include "security.h"
 
 int main(int argc, char* argv[])

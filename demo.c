@@ -1,8 +1,8 @@
-#include<stdio.h>
+#include <stdio.h>
 #include "acl.h"
-#include<errno.h>
-#include<string.h>
-#include<stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <stdlib.h>
 
 #define DEBUG_FILE_NAME "debug_files/sample.txt"
 

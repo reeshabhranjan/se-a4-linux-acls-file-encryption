@@ -1,27 +1,34 @@
 build:
-	gcc -g -o myls ls.c acl.c security.c
-	gcc -g -o myfput fput.c acl.c security.c
-	gcc -g -o myfget fget.c acl.c security.c
-	gcc -g -o mycreate_dir create_dir.c acl.c security.c
-	gcc -g -o mydo_exec do_exec.c acl.c security.c
-	gcc -g -o getacl getacl.c acl.c security.c
-	gcc -g -o setacl setacl.c acl.c security.c
+	gcc -g -o files/myls ls.c acl.c security.c
+	gcc -g -o files/myfput fput.c acl.c security.c
+	gcc -g -o files/myfget fget.c acl.c security.c
+	gcc -g -o files/mycreate_dir create_dir.c acl.c security.c
+	gcc -g -o files/mydo_exec do_exec.c acl.c security.c
+	gcc -g -o files/getacl getacl.c acl.c security.c
+	gcc -g -o files/setacl setacl.c acl.c security.c
+	gcc -g -o files/testing testing.c acl.c security.c crypto.c
+
+setup:
+	apt install libssl-dev
+	mkdir files
 
 perm:
-	chown root:root myls
-	chown root:root myfput
-	chown root:root myfget
-	chown root:root mycreate_dir
-	chown root:root mydo_exec
-	chown root:root getacl
-	chown root:root setacl
-	chmod u+s myls
-	chmod u+s myfput
-	chmod u+s myfget
-	chmod u+s mycreate_dir
-	chmod u+s mydo_exec
-	chmod u+s getacl
-	chmod u+s setacl
+	chown root:root files/myls
+	chown root:root files/myfput
+	chown root:root files/myfget
+	chown root:root files/mycreate_dir
+	chown root:root files/mydo_exec
+	chown root:root files/getacl
+	chown root:root files/setacl
+	chown root:root files/testing
+	chmod u+s files/myls
+	chmod u+s files/myfput
+	chmod u+s files/myfget
+	chmod u+s files/mycreate_dir
+	chmod u+s files/mydo_exec
+	chmod u+s files/getacl
+	chmod u+s files/setacl
+	chmod u+s files/testing
 
 clean:
-	rm ./myls ./myfput ./myfget ./mycreate_dir ./mydo_exec ./getacl ./setacl
+	rm files/myls files/myfput files/myfget files/mycreate_dir files/mydo_exec files/getacl files/setacl

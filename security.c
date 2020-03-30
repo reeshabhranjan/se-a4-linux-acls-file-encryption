@@ -1,15 +1,21 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "acl.h"
-#include<grp.h>
-#include<pwd.h>
-#include<sys/stat.h>
-#include<string.h>
+#include <grp.h>
+#include <pwd.h>
+#include <sys/stat.h>
+#include <string.h>
 
 int username_exists(char* username)
 {
     struct passwd* pwd = getpwnam(username);
+    return pwd != NULL;
+}
+
+int uid_exists(int uid)
+{
+    struct passwd* pwd = getpwuid(uid);
     return pwd != NULL;
 }
 
