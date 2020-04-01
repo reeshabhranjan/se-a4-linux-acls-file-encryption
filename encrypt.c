@@ -11,6 +11,8 @@
 #include <openssl/err.h>
 #include "acl.h"
 
+// TODO modify/improve implementations?
+
 // common constants
 const int KEY_SIZE_BITS = 256; // bits
 const int IV_SIZE_BITS = 128; // bits
@@ -127,4 +129,9 @@ char* decrypt_string(char* ciphertext, char* key, char* iv)
     EVP_CIPHER_CTX_free(context);
 
     return plaintext;
+}
+
+void fsign(char* filename, char* key, char* iv)
+{
+    
 }

@@ -8,6 +8,7 @@
 #include <pwd.h>
 #include "acl.h"
 #include "security.h"
+#include "utils.h"
 
 int main(int argc, char* argv[])
 {
@@ -28,8 +29,8 @@ int main(int argc, char* argv[])
 
     if (!file_exists(filepath))
     {
-        perror("The file does not exist.");
-        exit(1);
+        printf("The file does not exist. Creating one...\n");
+        create_file(filepath, getuid(), getgid(), 0644);
     }
 
     if (!is_file(filepath))
