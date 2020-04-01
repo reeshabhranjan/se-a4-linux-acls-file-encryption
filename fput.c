@@ -57,11 +57,7 @@ int main(int argc, char* argv[])
     char s[100000];
     fgets(s, 100000, stdin);
 
-    int len_s = strlen(s);
-
-    int fd = open(filepath, O_WRONLY | O_APPEND | O_CREAT);
-    write(fd, s, len_s);
-    close(fd);
+    write_to_file(filepath, s);
 
     seteuid(getuid());
     printf("UID: %d EUID: %d\n", getuid(), geteuid());

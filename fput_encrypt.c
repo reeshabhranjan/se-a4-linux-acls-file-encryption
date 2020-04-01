@@ -68,11 +68,7 @@ int main(int argc, char* argv[])
     s = NULL;
     s = ciphertext;
 
-    int len_s = strlen(s);
-
-    int fd = open(filepath, O_WRONLY | O_APPEND | O_CREAT);
-    write(fd, s, len_s);
-    close(fd);
+    write_to_file(filepath, s);
 
     seteuid(getuid());
     printf("UID: %d EUID: %d\n", getuid(), geteuid());
