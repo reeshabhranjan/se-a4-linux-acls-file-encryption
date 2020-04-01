@@ -7,6 +7,8 @@
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 #include <openssl/crypto.h>
+#include <openssl/conf.h>
+#include <openssl/err.h>
 #include "acl.h"
 
 // common constants
@@ -44,5 +46,85 @@ void generate_key_iv(char** key, char** iv)
 
 char* encrypt_string(char* plaintext, char* key, char* iv)
 {
+    EVP_CIPHER_CTX *context;
+    context = EVP_CIPHER_CTX_new();
+    
+    if (context == NULL)
+    {
+        perror("Cannot initialise context.");
+        exit(1);
+    }
 
+    int result = EVP_EncryptInit_ex(context, EVP_aes_256_cbc(), NULL, key, iv);
+    if (result != 1)
+    {
+        perror("Cannot initialise operation.");
+        exit(1);
+    }
+
+    char* ciphertext = (char*) malloc(1000);
+    int ciphertext_len = 0;
+
+    result = EVP_EncryptUpdate(context, ciphertext, &ciphertext_len, plaintext, strlen(plaintext));
+
+    if (result != 1)
+    {
+        perror("Couldn't complete encryption rounds.");
+        exit(1);
+    }
+
+    result = EVP_EncryptFinal_ex(context, ciphertext + ciphertext_len, &ciphertext_len);
+
+    if (result != 1)
+    {
+        perror("Couldn't complete the final encryption round.");
+        exit(1);
+    }
+
+    EVP_CIPHER_CTX_free(context);
+
+    return ciphertext;
+}
+
+char* decrypt_string(char* ciphertext, char* key, char* iv)
+{
+    EVP_CIPHER_CTX *context;
+    context = EVP_CIPHER_CTX_new();
+    
+    if (context == NULL)
+    {
+        perror("Cannot initialise context.");
+        exit(1);
+    }
+
+    int result = EVP_DecryptInit_ex(context, EVP_aes_256_cbc(), NULL, key, iv);
+
+    if (result != 1)
+    {
+        perror("Cannot initialise operation.");
+        exit(1);
+    }
+
+    char* plaintext = (char*) malloc(1000);
+    int plaintext_len = 0;
+
+    result = EVP_DecryptUpdate(context, plaintext, &plaintext_len, ciphertext, strlen(ciphertext));
+
+    if (result != 1)
+    {
+        perror("Cannot decrypt.");
+        exit(1);
+    }
+
+    result = EVP_DecryptFinal_ex(context, plaintext + plaintext_len, &plaintext_len);
+
+    if (result != 1)
+    {
+        perror("Cannot decrypt final step.");
+        exit(1);
+    }
+
+    EVP_CIPHER_CTX_free(context);
+
+    return plaintext;
 }

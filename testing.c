@@ -9,5 +9,11 @@ int main()
     char* key;
     char* iv;
     generate_key_iv(&key, &iv);
+    char* plaintext = "Hello world!";
+    char* ciphertext = encrypt_string(plaintext, key, iv);
+    printf("Plaintext:  %s\n", plaintext);
+    printf("Ciphertext: %s\n", ciphertext);
+    char* plaintext2 = decrypt_string(ciphertext, key, iv);
+    printf("Plaintext2: %s\n", plaintext2);
     return 0;
 }
