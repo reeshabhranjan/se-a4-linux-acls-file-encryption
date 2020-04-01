@@ -62,7 +62,7 @@ char* encrypt_string(char* plaintext, char* key, char* iv)
         exit(1);
     }
 
-    char* ciphertext = (char*) malloc(1000);
+    char* ciphertext = (char*) malloc(100000);
     int ciphertext_len = 0;
 
     result = EVP_EncryptUpdate(context, ciphertext, &ciphertext_len, plaintext, strlen(plaintext));
@@ -89,7 +89,7 @@ char* encrypt_string(char* plaintext, char* key, char* iv)
 char* decrypt_string(char* ciphertext, char* key, char* iv)
 {
     EVP_CIPHER_CTX *context;
-    context = EVP_CIPHER_CTX_new();
+    context = EVP_CIPHER_CTX_new(); // TODO can the context be shared between encr and decr?
     
     if (context == NULL)
     {
@@ -105,7 +105,7 @@ char* decrypt_string(char* ciphertext, char* key, char* iv)
         exit(1);
     }
 
-    char* plaintext = (char*) malloc(1000);
+    char* plaintext = (char*) malloc(100000);
     int plaintext_len = 0;
 
     result = EVP_DecryptUpdate(context, plaintext, &plaintext_len, ciphertext, strlen(ciphertext));

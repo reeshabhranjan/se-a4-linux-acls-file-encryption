@@ -6,7 +6,10 @@ build:
 	gcc -g -o files/mydo_exec do_exec.c acl.c security.c
 	gcc -g -o files/getacl getacl.c acl.c security.c
 	gcc -g -o files/setacl setacl.c acl.c security.c
+	# encryption functions
 	gcc -g -o files/testing testing.c acl.c security.c encrypt.c -lcrypto
+	gcc -g -o files/fput_encrypt fput_encrypt.c acl.c security.c encrypt.c -lcrypto
+	gcc -g -o files/fget_decrypt fget_decrypt.c acl.c security.c encrypt.c -lcrypto
 
 setup:
 	apt install libssl-dev
@@ -21,6 +24,8 @@ perm:
 	chown root:root files/getacl
 	chown root:root files/setacl
 	chown root:root files/testing
+	chown root:root files/fput_encrypt
+	chown root:root files/fget_decrypt
 	chmod u+s files/myls
 	chmod u+s files/myfput
 	chmod u+s files/myfget
@@ -29,6 +34,8 @@ perm:
 	chmod u+s files/getacl
 	chmod u+s files/setacl
 	chmod u+s files/testing
+	chmod u+s files/fput_encrypt
+	chmod u+s files/fget_decrypt
 
 clean:
 	rm files/myls files/myfput files/myfget files/mycreate_dir files/mydo_exec files/getacl files/setacl
