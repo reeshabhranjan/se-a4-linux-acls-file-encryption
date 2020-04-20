@@ -145,7 +145,7 @@ void fsign(char* buffer, char* filepath)
     }
     
     // TODO make key size unique
-    EVP_MD* message_digest = EVP_get_digestbyname("SHA512");
+    const EVP_MD* message_digest = EVP_get_digestbyname("SHA512");
     if (message_digest == NULL)
     {
         perror("Cannot retrieve message_digest.");
@@ -182,7 +182,7 @@ void fsign(char* buffer, char* filepath)
     }
     
     char* checksum;
-    int checksumlen;
+    size_t checksumlen;
     // this initial call is necessary to know the checksum length
     result = EVP_DigestSignFinal(context, NULL, &checksumlen);
     if (result != 1 || checksumlen <= 0)

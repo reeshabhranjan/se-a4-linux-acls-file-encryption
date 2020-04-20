@@ -7,9 +7,9 @@ build:
 	gcc -g -o files/getacl getacl.c acl.c security.c
 	gcc -g -o files/setacl setacl.c acl.c security.c
 	# encryption functions
-	gcc -g -o files/testing testing.c acl.c security.c encrypt.c -lcrypto
-	gcc -g -o files/fput_encrypt fput_encrypt.c acl.c security.c encrypt.c -lcrypto
-	gcc -g -o files/fget_decrypt fget_decrypt.c acl.c security.c encrypt.c -lcrypto
+	gcc -g -o files/testing testing.c acl.c security.c encrypt.c utils.c -lcrypto
+	gcc -g -o files/fput_encrypt fput_encrypt.c acl.c security.c encrypt.c utils.c -lcrypto
+	gcc -g -o files/fget_decrypt fget_decrypt.c acl.c security.c encrypt.c utils.c -lcrypto
 
 setup:
 	apt install libssl-dev
