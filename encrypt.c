@@ -133,7 +133,7 @@ char* decrypt_string(char* ciphertext, char* key, char* iv)
     return plaintext;
 }
 
-void fsign(char* buffer, char* key, char* filepath)
+void fsign(char* buffer, char* filepath)
 {
     // TODO error handling
     EVP_MD_CTX* context;
