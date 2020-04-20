@@ -132,10 +132,9 @@ char* decrypt_string(char* ciphertext, char* key, char* iv)
     return plaintext;
 }
 
-void fsign(char* filepath, char* key, char* iv)
+void fsign(char* buffer, char* key, char* filepath)
 {
     // TODO error handling
-    char* buffer = read_from_file(filepath);
     EVP_MD_CTX* context;
     context = EVP_MD_CTX_create();
     if (context == NULL)
@@ -144,6 +143,7 @@ void fsign(char* filepath, char* key, char* iv)
         exit(1);
     }
     
+    // TODO make key size unique
     EVP_MD* message_digest = EVP_get_digestbyname("SHA512");
     if (message_digest == NULL)
     {
@@ -159,5 +159,37 @@ void fsign(char* filepath, char* key, char* iv)
         exit(1);
     }
 
+    char* key;
+    char* iv;
+    generate_key_iv(&key, &iv);
+    EVP_PKEY* evp_key = EVP_PKEY_new_mac_key(EVP_PKEY_HMAC, NULL, key, strlen(key));
+
+    result = EVP_DigestSignInit(context, NULL, message_digest, NULL, evp_key);
+
+    if (result != 1)
+    {
+        perror("Cannot initialise digest-sign.");
+        exit(1);
+    }
+
+    result = EVP_DigestSignUpdate(context, buffer, strlen(buffer));
+
+    if (result != 1)
+    {
+        perror("Cannot execute update step of digest-sign.");
+        exit(1);
+    }
     
+    char* checksum;
+    int checksumlen;
+    result = EVP_DigestSignFinal(context, checksum, &checksumlen);
+    if (result != 1 || checksumlen <= 0)
+    {
+        perror("Cannot execute the final step of digest-sign.");
+        exit(1);
+    }
+
+    char* signature_file_name = concatenate_strings(filepath, ".sign");
+    write_to_file(filepath, checksum);
+
 }
