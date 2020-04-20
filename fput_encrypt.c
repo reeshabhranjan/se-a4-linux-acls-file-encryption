@@ -70,6 +70,16 @@ int main(int argc, char* argv[])
 
     write_to_file(filepath, s);
 
+    // create HMAC
+    char* checksum = fsign(s);
+    char* checksum_file_name = concatenate_strings(filepath, ".sign");
+    if (!file_exists(checksum_file_name))
+    {
+        // TODO what permissions to give to the checksum file
+        create_file(checksum_file_name, getuid(), getgid(), 0644);
+    }
+    write_to_file(checksum_file_name, checksum);
+
     seteuid(getuid());
     printf("UID: %d EUID: %d\n", getuid(), geteuid());
 
