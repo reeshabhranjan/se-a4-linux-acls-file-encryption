@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
     char s[100000];
     fgets(s, 100000, stdin);
 
-    write_to_file(filepath, s);
+    write_to_file(filepath, s, 1);
 
     // create HMAC
     char* checksum = fsign(s);
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
         // TODO what permissions to give to the checksum file
         create_file(checksum_file_name, getuid(), getgid(), 0644);
     }
-    write_to_file(checksum_file_name, checksum);
+    write_to_file(checksum_file_name, checksum, 1);
 
     seteuid(getuid());
     printf("UID: %d EUID: %d\n", getuid(), geteuid());

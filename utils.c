@@ -23,9 +23,18 @@ char* concatenate_strings(char* s1, char* s2)
     return s;
 }
 
-void write_to_file(char* filepath, char* buffer)
+void write_to_file(char* filepath, char* buffer, int overwrite)
 {
-    int fd = open(filepath, O_WRONLY | O_APPEND | O_CREAT);
+    int fd = -1;
+    if (overwrite)
+    {
+        fd = open(filepath, O_WRONLY | O_CREAT | O_TRUNC);
+    }
+    else
+    {
+        fd = open(filepath, O_WRONLY | O_APPEND | O_CREAT);
+    }
+    
     write(fd, buffer, strlen(buffer));
     close(fd);
 }
