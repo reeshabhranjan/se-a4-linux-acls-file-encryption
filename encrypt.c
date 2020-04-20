@@ -18,6 +18,7 @@
 // common constants
 const int KEY_SIZE_BITS = 256; // bits
 const int IV_SIZE_BITS = 128; // bits
+#define SIGNATURE_EXTENSION ".sign"
 
 // functions for encryption-decryption and sign-verify
 
@@ -133,9 +134,10 @@ char* decrypt_string(char* ciphertext, char* key, char* iv)
     return plaintext;
 }
 
-void fsign(char* buffer, char* filepath)
+char* fsign(char* buffer)
 {
     // TODO error handling
+    // TODO check for read and write permissions
     EVP_MD_CTX* context;
     context = EVP_MD_CTX_create();
     if (context == NULL)
@@ -208,12 +210,23 @@ void fsign(char* buffer, char* filepath)
     }
 
 
-    char* signature_file_name = concatenate_strings(filepath, ".sign");
+/*     char* signature_file_name = concatenate_strings(filepath, ".sign");
 
     if (!file_exists(signature_file_name))
     {
         create_file(signature_file_name, getuid(), getgid(), 0644);
     }
-    write_to_file(signature_file_name, checksum);
+    write_to_file(signature_file_name, checksum); */
 
+    return checksum;
+}
+
+int fverify(char* filepath)
+{
+    // TODO check for read permissions
+    char* filepath_checksum = concatenate_strings(filepath, SIGNATURE_EXTENSION);
+    char* checksum_file = read_from_file(filepath_checksum);
+    char* content = read_from_file(filepath);
+    char* checksum_derived = fsign(content);
+    return (strcmp(checksum_file, checksum_derived) == 0);
 }

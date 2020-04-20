@@ -6,7 +6,7 @@
 
 int main()
 {
-    char* key;
+/*     char* key;
     char* iv;
     generate_key_iv(&key, &iv);
     char* plaintext = "Hello world!";
@@ -14,6 +14,8 @@ int main()
     printf("Plaintext:  %s\n", plaintext);
     printf("Ciphertext: %s\n", ciphertext);
     char* plaintext2 = decrypt_string(ciphertext, key, iv);
-    printf("Plaintext2: %s\n", plaintext2);
+    printf("Plaintext2: %s\n", plaintext2); */
+    // fsign("Hello", "checksum2.txt");
+    printf("%d\n", fverify("checksum2.txt"));
     return 0;
 }
