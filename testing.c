@@ -16,6 +16,6 @@ int main()
     char* plaintext2 = decrypt_string(ciphertext, key, iv);
     printf("Plaintext2: %s\n", plaintext2); */
     // fsign("Hello", "checksum2.txt");
-    printf("%d\n", fverify("checksum2.txt"));
+    printf("%d\n", fverify("abc2.txt"));
     return 0;
 }

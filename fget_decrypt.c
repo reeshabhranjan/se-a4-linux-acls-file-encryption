@@ -50,6 +50,14 @@ int main(int argc, char* argv[])
 
     printf("UID: %d EUID: %d\n", getuid(), geteuid());
 
+    int verification_result = fverify(filepath);
+
+    if (!verification_result)
+    {
+        printf("Checksum verification failed. Exiting.\n");
+        exit(1);
+    }
+
     char* buf = (char*) malloc(100000);
 
     int fd = open(filepath, O_RDONLY);

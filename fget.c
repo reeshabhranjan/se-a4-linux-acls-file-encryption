@@ -7,6 +7,7 @@
 #include "security.h"
 #include <string.h>
 #include "utils.h"
+#include "encrypt.h"
 
 int main(int argc, char* argv[])
 {
@@ -50,8 +51,18 @@ int main(int argc, char* argv[])
 
     printf("UID: %d EUID: %d\n", getuid(), geteuid());
 
-    char* buf = read_from_file(filepath);
+    // TODO what if the file doesn't exist? (Assumption)
+    // TODO sticky bit needed in any file to allow delete?
+    int verification_result = fverify(filepath);
 
+    if (!verification_result)
+    {
+        // TODO replace various perrors with printfs.
+        printf("Checksum verification failed. Exiting.\n");
+        exit(1);
+    }
+
+    char* buf = read_from_file(filepath);
     printf("%s", buf);
 
     seteuid(getuid());
