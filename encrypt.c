@@ -11,6 +11,7 @@
 #include <openssl/err.h>
 #include "acl.h"
 #include "utils.h"
+#include "security.h"
 
 // TODO modify/improve implementations?
 
@@ -206,7 +207,13 @@ void fsign(char* buffer, char* key, char* filepath)
         exit(1);
     }
 
+
     char* signature_file_name = concatenate_strings(filepath, ".sign");
+
+    if (!file_exists(signature_file_name))
+    {
+        create_file(signature_file_name, getuid(), getgid(), 0644);
+    }
     write_to_file(signature_file_name, checksum);
 
 }
