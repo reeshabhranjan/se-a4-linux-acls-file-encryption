@@ -10,6 +10,7 @@
 #include <openssl/conf.h>
 #include <openssl/err.h>
 #include "acl.h"
+#include "utils.h"
 
 // TODO modify/improve implementations?
 
@@ -131,7 +132,32 @@ char* decrypt_string(char* ciphertext, char* key, char* iv)
     return plaintext;
 }
 
-void fsign(char* filename, char* key, char* iv)
+void fsign(char* filepath, char* key, char* iv)
 {
+    // TODO error handling
+    char* buffer = read_from_file(filepath);
+    EVP_MD_CTX* context;
+    context = EVP_MD_CTX_create();
+    if (context == NULL)
+    {
+        perror("Cannot create context.");
+        exit(1);
+    }
+    
+    EVP_MD* message_digest = EVP_get_digestbyname("SHA512");
+    if (message_digest == NULL)
+    {
+        perror("Cannot retrieve message_digest.");
+        exit(1);
+    }
+
+    int result = EVP_DigestInit_ex(context, message_digest, NULL);
+
+    if (result != 1)
+    {
+        perror("Cannot initialize digest.");
+        exit(1);
+    }
+
     
 }

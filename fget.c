@@ -6,6 +6,7 @@
 #include "acl.h"
 #include "security.h"
 #include <string.h>
+#include "utils.h"
 
 int main(int argc, char* argv[])
 {
@@ -49,10 +50,7 @@ int main(int argc, char* argv[])
 
     printf("UID: %d EUID: %d\n", getuid(), geteuid());
 
-    char buf[10000];
-
-    int fd = open(filepath, O_RDONLY);
-    read(fd, buf, 10000);
+    char* buf = read_from_file(filepath);
 
     printf("%s", buf);
 
