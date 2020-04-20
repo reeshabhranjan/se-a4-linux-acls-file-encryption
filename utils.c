@@ -15,7 +15,7 @@ char* concatenate_strings(char* s1, char* s2)
 
     for (int i = n1; i < n1 + n2; i++)
     {
-        s[i - n1] = s2[i];
+        s[i] = s2[i - n1];
     }
     
     s[n1 + n2] = '\0';
