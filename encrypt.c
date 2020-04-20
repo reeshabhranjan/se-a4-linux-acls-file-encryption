@@ -182,14 +182,31 @@ void fsign(char* buffer, char* key, char* filepath)
     
     char* checksum;
     int checksumlen;
-    result = EVP_DigestSignFinal(context, checksum, &checksumlen);
+    // this initial call is necessary to know the checksum length
+    result = EVP_DigestSignFinal(context, NULL, &checksumlen);
     if (result != 1 || checksumlen <= 0)
     {
-        perror("Cannot execute the final step of digest-sign.");
+        perror("Cannot calculate the checksum length.");
+        exit(1);
+    }
+
+    checksum = OPENSSL_malloc(checksumlen);
+
+    if (checksum == NULL)
+    {
+        perror("Couldn't initialise checksum variable.");
+        exit(1);
+    }
+
+    result = EVP_DigestSignFinal(context, checksum, &checksumlen);
+
+    if (result == -1)
+    {
+        perror("Couldn't retrieve the checksum from the last step of HMAC.");
         exit(1);
     }
 
     char* signature_file_name = concatenate_strings(filepath, ".sign");
-    write_to_file(filepath, checksum);
+    write_to_file(signature_file_name, checksum);
 
 }
