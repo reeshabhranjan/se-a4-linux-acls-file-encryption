@@ -7,4 +7,5 @@ char* encrypt_string(char* plaintext, char* key, char* iv);
 char* decrypt_string(char* ciphertext, char* key, char* iv);
 char* fsign(char* buffer);
 int fverify(char* filepath);
+char* gen_rand(int length);
 #endif

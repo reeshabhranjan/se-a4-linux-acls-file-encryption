@@ -9,6 +9,7 @@
 #include <openssl/crypto.h>
 #include <openssl/conf.h>
 #include <openssl/err.h>
+#include <openssl/rand.h>
 #include "acl.h"
 #include "utils.h"
 #include "security.h"
@@ -229,4 +230,15 @@ int fverify(char* filepath)
     char* content = read_from_file(filepath);
     char* checksum_derived = fsign(content);
     return (strcmp(checksum_file, checksum_derived) == 0);
+}
+
+char* gen_rand(int length)
+{
+    char* random_string = (char*) malloc(length);
+    for (int i = 0; i < length; i++)
+    {
+        random_string[i] = '0' + (rand()%10);
+    }
+    
+    return random_string;
 }

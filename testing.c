@@ -16,6 +16,8 @@ int main()
     char* plaintext2 = decrypt_string(ciphertext, key, iv);
     printf("Plaintext2: %s\n", plaintext2); */
     // fsign("Hello", "checksum2.txt");
-    printf("%d\n", fverify("abc2.txt"));
+    // printf("%d\n", fverify("abc2.txt"));
+    char* random_string = gen_rand(20);
+    printf("random_string: %s\n", random_string);
     return 0;
 }
