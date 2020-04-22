@@ -10,6 +10,7 @@
 #include <openssl/conf.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
+#include <openssl/pem.h>
 #include "acl.h"
 #include "utils.h"
 #include "security.h"
@@ -20,6 +21,9 @@
 const int KEY_SIZE_BITS = 256; // bits
 const int IV_SIZE_BITS = 128; // bits
 #define SIGNATURE_EXTENSION ".sign"
+#define RANDOM_NUM_EXTENSION ".rand"
+#define PART_2_SUB_DIRECTORY "part-2/"
+#define RSA_FILE_EXTENSION ".pem"
 
 // functions for encryption-decryption and sign-verify
 
@@ -40,14 +44,20 @@ char* get_username()
     return username;
 }
 
+void generate_key_iv_from_passphrase_and_salt(char** key, char** iv, char* passphrase, char* salt)
+{
+    char key_iv[KEY_SIZE_BITS / 8 + IV_SIZE_BITS / 8 + 10]; // 10 as a buffer if anything goes unexpected
+    // TODO is it safe to call strlen on salt?
+    PKCS5_PBKDF2_HMAC_SHA1(passphrase, strlen(passphrase), salt, strlen(salt), 1024, KEY_SIZE_BITS / 8 + IV_SIZE_BITS / 8, key_iv);
+    *key = substring(key_iv, 0, KEY_SIZE_BITS / 8);
+    *iv = substring(key_iv, KEY_SIZE_BITS / 8, KEY_SIZE_BITS / 8 + IV_SIZE_BITS / 8);    
+}
+
 void generate_key_iv(char** key, char** iv)
 {
     char* passphrase = get_password(); // TODO what if there is no password? (NULL or something else?)
     char* salt = get_username();
-    char key_iv[KEY_SIZE_BITS / 8 + IV_SIZE_BITS / 8 + 10]; // 10 as a buffer if anything goes unexpected
-    PKCS5_PBKDF2_HMAC_SHA1(passphrase, strlen(passphrase), salt, strlen(salt), 1024, KEY_SIZE_BITS / 8 + IV_SIZE_BITS / 8, key_iv);
-    *key = substring(key_iv, 0, KEY_SIZE_BITS / 8);
-    *iv = substring(key_iv, KEY_SIZE_BITS / 8, KEY_SIZE_BITS / 8 + IV_SIZE_BITS / 8);
+    generate_key_iv_from_passphrase_and_salt(key, iv, passphrase, salt);
 }
 
 char* encrypt_string(char* plaintext, char* key, char* iv)
@@ -224,6 +234,7 @@ char* fsign(char* buffer)
 
 int fverify(char* filepath)
 {
+    // TODO array of bytes v/s array of chars
     // TODO check for read permissions
     char* filepath_checksum = concatenate_strings(filepath, SIGNATURE_EXTENSION);
     char* checksum_file = read_from_file(filepath_checksum);
@@ -241,4 +252,64 @@ char* gen_rand(int length)
     }
     
     return random_string;
+}
+
+char* encrypt_string_trapdoor(char* buffer)
+{
+    int n = strlen(buffer);
+    char* filepath_random = concatenate_strings(PART_2_SUB_DIRECTORY, get_username());
+    char* dummy = filepath_random;
+    filepath_random = concatenate_strings(filepath_random, RANDOM_NUM_EXTENSION);
+    free(dummy);
+    char* key;
+    char* iv;
+    generate_key_iv(&key, &iv);
+    if (!file_exists(filepath_random))
+    {
+        create_file(filepath_random, getuid(), getgid(), 0644); // TODO permission needs to be set accordingly?
+        // TODO setacl
+        char* string_random_number = gen_rand(64);
+        char* string_random_number_encrypted = encrypt_string(string_random_number, key, iv);
+        write_to_file(filepath_random, string_random_number_encrypted, 1);
+    }
+    char* string_random_number_encrypted = read_from_file(filepath_random);
+    char* string_random_number = decrypt_string(string_random_number_encrypted, key, iv);
+
+    // TODO make sure you are not changing the key and iv variables
+    // pointing at some field of pwd struct, like the above char* key and char* iv
+
+    // now generate an encryption key using random number
+    // as the passphrase and username as salt
+    char* key_trapdoor;
+    char* iv_trapdoor;
+    generate_key_iv_from_passphrase_and_salt(&key_trapdoor, &iv_trapdoor, string_random_number, get_username());
+
+    char* string_encrypted_trapdoor = encrypt_string(buffer, key_trapdoor, iv_trapdoor);
+    return string_encrypted_trapdoor;
+}
+
+char* create_hmac_trapdoor(char* buffer)
+{
+    char* filepath_rsa_credentials = concatenate_strings(PART_2_SUB_DIRECTORY, get_username());
+    char* dummy = filepath_rsa_credentials;
+    filepath_rsa_credentials = concatenate_strings(filepath_rsa_credentials, RSA_FILE_EXTENSION);
+    free(dummy);
+
+    if (!file_exists(filepath_rsa_credentials))
+    {
+        // TODO assume that the current user will always have a file with his/her name
+        // and the related permissions?
+        printf("There is no RSA public-private key pair file correspnding to current user\n");
+        exit(1);
+    }
+
+    FILE* rsa_pem_file = fopen(filepath_rsa_credentials, 'r');
+    RSA* rsa_private_key = PEM_read_RSAPrivateKey(rsa_pem_file, NULL, NULL, NULL);
+
+    if (rsa_private_key == NULL)
+    {
+        printf("Cannot read RSA PEM file\n");
+        exit(1);
+    }
+
 }
