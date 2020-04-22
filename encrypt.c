@@ -288,8 +288,9 @@ char* encrypt_string_trapdoor(char* buffer)
     return string_encrypted_trapdoor;
 }
 
-char* create_hmac_trapdoor(char* buffer)
+EVP_PKEY* read_rsa_private_key_from_file()
 {
+    // TODO replace the path with home directory
     char* filepath_rsa_credentials = concatenate_strings(PART_2_SUB_DIRECTORY, get_username());
     char* dummy = filepath_rsa_credentials;
     filepath_rsa_credentials = concatenate_strings(filepath_rsa_credentials, RSA_FILE_EXTENSION);
@@ -303,13 +304,47 @@ char* create_hmac_trapdoor(char* buffer)
         exit(1);
     }
 
-    FILE* rsa_pem_file = fopen(filepath_rsa_credentials, 'r');
-    RSA* rsa_private_key = PEM_read_RSAPrivateKey(rsa_pem_file, NULL, NULL, NULL);
+    FILE* rsa_pem_file = fopen(filepath_rsa_credentials, "r");
+    EVP_PKEY* rsa_private_key = PEM_read_PrivateKey(rsa_pem_file, &rsa_private_key, NULL, NULL);
 
     if (rsa_private_key == NULL)
     {
-        printf("Cannot read RSA PEM file\n");
+        printf("Cannot read RSA private key\n");
         exit(1);
     }
 
+    return rsa_private_key;
+}
+
+EVP_PKEY* read_rsa_public_key_from_file()
+{
+    // TODO replace the path with home directory
+    char* filepath_rsa_credentials = concatenate_strings(PART_2_SUB_DIRECTORY, get_username());
+    char* dummy = filepath_rsa_credentials;
+    filepath_rsa_credentials = concatenate_strings(filepath_rsa_credentials, RSA_FILE_EXTENSION);
+    free(dummy);
+
+    if (!file_exists(filepath_rsa_credentials))
+    {
+        // TODO assume that the current user will always have a file with his/her name
+        // and the related permissions?
+        printf("There is no RSA public-private key pair file correspnding to current user\n");
+        exit(1);
+    }
+
+    FILE* rsa_pem_file = fopen(filepath_rsa_credentials, "r");
+    EVP_PKEY* rsa_public_key = PEM_read_PUBKEY(rsa_pem_file, &rsa_public_key, NULL, NULL);
+
+    if (rsa_public_key == NULL)
+    {
+        printf("Cannot read RSA private key\n");
+        exit(1);
+    }
+
+    return rsa_public_key;
+}
+
+char* create_hmac_trapdoor(char* buffer)
+{
+    
 }
