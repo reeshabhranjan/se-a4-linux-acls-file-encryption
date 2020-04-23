@@ -346,5 +346,132 @@ EVP_PKEY* read_rsa_public_key_from_file()
 
 char* create_hmac_trapdoor(char* buffer)
 {
+    EVP_PKEY* private_key = read_rsa_private_key_from_file();
+    EVP_MD_CTX* context = EVP_MD_CTX_create();
     
+    if (context == NULL)
+    {
+        printf("Cannot create hmac-trapdoor's context.\n");
+        exit(1);
+    }
+
+    int result = EVP_DigestSignInit(context, NULL, EVP_sha512(), NULL, private_key);
+    if (result != 1)
+    {
+        printf("create_hmac_trapdoor: EVP_DigestSignInit failed.\n");
+        exit(1);
+    }
+
+    result = EVP_DigestSignUpdate(context, buffer, strlen(buffer));
+
+    if (result != 1)
+    {
+        printf("create_hmac_trapdoor: EVP_DigestSignUpdate failed.\n");
+        exit(1);
+    }
+
+    // this call is needed to check the length of the signature
+    int sig_len;
+
+    result = EVP_DigestSignFinal(context, NULL, &sig_len);
+
+    if (result != 1 || sig_len < 0)
+    {
+        printf("create_hmac_trapdoor: EVP_DigestSignFinal (pre-call) failed.\n");
+        exit(1);
+    }
+
+    char* string_signature = OPENSSL_malloc(sig_len);
+
+    if (string_signature == NULL)
+    {
+        printf("create_hmac_trapdoor: OPENSSL_malloc failed.\n");
+        exit(1);
+    }
+
+    result = EVP_DigestSignFinal(context, string_signature, sig_len);
+
+    // TODO call EVP_MD_CTX_destroy(context) everywhere
+    // TODO check every free() call such that it doesn't free
+    // a pointer passed into the functin
+    return string_signature;
+}
+
+int verify_hmac_trapdoor(char* filepath)
+{
+
+    // derive the symmetric key
+    char* filepath_random_number = concatenate_strings(get_username(), RANDOM_NUM_EXTENSION);
+    char* key_user;
+    char* iv_user;
+    generate_key_iv(&key_user, &iv_user);
+
+    if (!file_exists(filepath_random_number))
+    {
+        printf("The random-number file does not exist.\n");
+        exit(1);
+    }
+
+    char* string_random_encrypted = read_from_file(filepath_random_number);
+    char* string_random = decrypt_string(string_random_encrypted, key_user, iv_user);
+
+    char* key_trapdoor;
+    char* iv_trapdoor;
+
+    generate_key_iv_from_passphrase_and_salt(&key_trapdoor, &iv_trapdoor, string_random, get_username());
+
+
+
+    // recalculate the signature from data file
+    if (!file_exists(filepath))
+    {
+        printf("The input file doesn't exist.\n");
+        exit(1);
+    }
+
+    char* string_content_encrypted = read_from_file(filepath);
+
+    // decrypt the contents
+    char* string_content = decrypt_string(string_content_encrypted, key_trapdoor, iv_trapdoor);
+    char* string_checksum_content = create_hmac_trapdoor(string_content);
+
+    // start verification
+
+    char* filepath_signature = concatenate_strings(filepath, SIGNATURE_EXTENSION);
+
+    if (!file_exists(filepath_signature))
+    {
+        printf("verify_hmac_trapdoor: cannot find the required signature file\n");
+        exit(1);
+    }
+
+    EVP_PKEY* public_key = read_rsa_public_key_from_file();
+
+    EVP_MD_CTX* context = EVP_MD_CTX_create();
+
+    if (context == NULL)
+    {
+        printf("verify_hmac_trapdoor: cannot create context\n");
+        exit(1);
+    }
+
+    int result = EVP_DigestVerifyInit(context, NULL, EVP_sha512(), NULL, public_key);
+
+    if (result != 1)
+    {
+        printf("verify_hmac_trapdoor: EVP_DigestVerifyInit failed\n");
+        exit(1);
+    }
+
+    result = EVP_DigestVerifyUpdate(context, string_content, strlen(string_content));
+
+    if (result != 1)
+    {
+        printf("verify_hmac_trapdoor: EVP_DigestVerifyUpdate failed.\n");
+        exit(1);
+    }
+
+    result = EVP_DigestVerifyFinal(context, string_checksum_content, strlen(string_checksum_content));
+
+    return result;
 }
