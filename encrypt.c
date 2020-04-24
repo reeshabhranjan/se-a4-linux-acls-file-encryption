@@ -401,7 +401,10 @@ int verify_hmac_trapdoor(char* filepath)
 {
 
     // derive the symmetric key
-    char* filepath_random_number = concatenate_strings(get_username(), RANDOM_NUM_EXTENSION);
+    char* filepath_random_number = concatenate_strings(PART_2_SUB_DIRECTORY, get_username());
+    char* dummy = filepath_random_number;
+    filepath_random_number = concatenate_strings(filepath_random_number, RANDOM_NUM_EXTENSION);
+    free(dummy);
     char* key_user;
     char* iv_user;
     generate_key_iv(&key_user, &iv_user);
@@ -474,4 +477,34 @@ int verify_hmac_trapdoor(char* filepath)
     result = EVP_DigestVerifyFinal(context, string_checksum_content, strlen(string_checksum_content));
 
     return result;
+}
+
+char* decrypt_string_trapdoor(char* ciphertext)
+{
+    char* filepath_random_number = concatenate_strings(PART_2_SUB_DIRECTORY, get_username());
+    char* dummy = filepath_random_number;
+    filepath_random_number = concatenate_strings(filepath_random_number, RANDOM_NUM_EXTENSION);
+    free(dummy);
+
+    if (!file_exists(filepath_random_number))
+    {
+        printf("Random number file does not exist.\n");
+        exit(1);
+    }
+
+    char* key;
+    char* iv;
+    generate_key_iv(&key, &iv);
+
+    char* string_random_encrypted = read_from_file(filepath_random_number);
+    char* string_random = decrypt_string(string_random_encrypted, key, iv);
+
+
+    char* key_trapdoor;
+    char* iv_trapdoor;
+    generate_key_iv_from_passphrase_and_salt(&key, &iv, string_random, get_username());
+
+    char* plaintext = decrypt_string(ciphertext, key_trapdoor, iv_trapdoor);
+
+    return plaintext;
 }
