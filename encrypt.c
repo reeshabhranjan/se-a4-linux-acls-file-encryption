@@ -132,6 +132,7 @@ char* decrypt_string(char* ciphertext, char* key, char* iv, int ciphertext_len)
     char* plaintext = (char*) malloc(100000);
     memset(plaintext, 0, 100000);
     int plaintext_len = 0;
+    int plaintext_final_len = 0;
 
     result = EVP_DecryptUpdate(context, plaintext, &plaintext_len, ciphertext, ciphertext_len);
 
@@ -141,6 +142,8 @@ char* decrypt_string(char* ciphertext, char* key, char* iv, int ciphertext_len)
         exit(1);
     }
 
+    plaintext_final_len += plaintext_len;
+
     result = EVP_DecryptFinal_ex(context, plaintext + plaintext_len, &plaintext_len);
 
     if (result != 1)
@@ -149,6 +152,9 @@ char* decrypt_string(char* ciphertext, char* key, char* iv, int ciphertext_len)
         ERR_print_errors_fp(stderr);
         exit(1);
     }
+
+    plaintext_final_len += plaintext_len;
+    plaintext[plaintext_final_len] = '\0';
 
     EVP_CIPHER_CTX_free(context);
 
@@ -296,33 +302,20 @@ char* encrypt_string_trapdoor(char* buffer, int* ciphertext_len_return)
     char* key;
     char* iv;
     generate_key_iv(&key, &iv);
-    key = "xxxxxxxxxxxxxxxx";
-    iv = "xxxxxxxxxxxxxxxx";
-    // key = "key123";
-    // iv = "iv123";
     char* dummy_remove;
     if (!file_exists(filepath_random))
     {
         create_file(filepath_random, getuid(), getgid(), 0644); // TODO permission needs to be set accordingly?
         // TODO setacl
         char* string_random_number = gen_rand(64);
-        // printf("[!] encrypt.c: random_number generated: %s\n", string_random_number);
         int ciphertext_len;
         char* string_random_number_encrypted = encrypt_string(string_random_number, key, iv, &ciphertext_len);
-        // printf("[!] encrypt.c: created encrypted random file with bytes: %d\n", ciphertext_len);
-        // printf("[!] encypt.c: key used for encrypting: %s", key);
-        // printf("[!] encypt.c: iv used for encrypting: %s", iv);
         write_to_file_with_len(filepath_random, string_random_number_encrypted, ciphertext_len, 1);
-        dummy_remove = string_random_number_encrypted;
     }
     int ciphertext_len_random;
     char* string_random_number_encrypted = read_from_file_with_num_bytes(filepath_random, &ciphertext_len_random);
-    string_random_number_encrypted = dummy_remove;
-    // printf("[!] encrypt.c ciphertext_len_random: %d\n", ciphertext_len_random);
-    // printf("[!] encypt.c: key used for decrypting: %s", key);
-    // printf("[!] encypt.c: iv used for decrypting: %s", iv);
     char* string_random_number = decrypt_string(string_random_number_encrypted, key, iv, ciphertext_len_random);
-
+    printf("[!] encrypt.c trapdoor encryption: random number = %s\n", string_random_number);
     // TODO make sure you are not changing the key and iv variables
     // pointing at some field of pwd struct, like the above char* key and char* iv
 
@@ -524,12 +517,13 @@ char* decrypt_string_trapdoor(char* ciphertext, int ciphertext_len)
     char* key;
     char* iv;
     generate_key_iv(&key, &iv);
-    key = "xxxxxxxxxxxxxxxx";
-    iv = "xxxxxxxxxxxxxxxx";
+    // key = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+    // iv =  "xxxxxxxxxxxxxxxx";
 
     int ciphertext_len_random;
     char* string_random_encrypted = read_from_file_with_num_bytes(filepath_random_number, &ciphertext_len_random);
     char* string_random = decrypt_string(string_random_encrypted, key, iv, ciphertext_len_random);
+    printf("[!] encrypt.c trapdoor decryption: %s\n", string_random);
 
 
     char* key_trapdoor;
