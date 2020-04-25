@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
     s = NULL;
     s = ciphertext;
 
-    write_to_file(filepath, s, 1);
+    write_to_file_with_len(filepath, s, ciphertext_len, 1);
 
     // create HMAC
     int checksum_len;
@@ -81,6 +81,7 @@ int main(int argc, char* argv[])
         create_file(checksum_file_name, getuid(), getgid(), 0644);
     }
     write_to_file_with_len(checksum_file_name, checksum, checksum_len, 1);
+    // printf("[!] fput_encrypt.c: number of bytes written: %d\n", checksum_len);
 
     seteuid(getuid());
     printf("UID: %d EUID: %d\n", getuid(), geteuid());

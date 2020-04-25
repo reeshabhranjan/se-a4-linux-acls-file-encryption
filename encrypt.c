@@ -233,10 +233,10 @@ int fverify(char* filepath)
     // TODO check for read permissions
     char* filepath_checksum = concatenate_strings(filepath, SIGNATURE_EXTENSION);
     int checksum_len_file;
-    char* checksum_file = read_from_file_with_num_bytes(filepath_checksum, &checksum_len_file);
+    char* string_checksum_file = read_from_file_with_num_bytes(filepath_checksum, &checksum_len_file);
     char* content = read_from_file(filepath);
     int checksum_len_derived;
-    char* checksum_derived = fsign(content, &checksum_len_derived);
+    char* string_checksum_derived = fsign(content, &checksum_len_derived);
 
     if (checksum_len_derived != checksum_len_file)
     {
@@ -248,7 +248,7 @@ int fverify(char* filepath)
 
     for (int i = 0; i < checksum_len_derived; i++)
     {
-        if (checksum_file[i] != checksum_derived[i])
+        if (string_checksum_file[i] != string_checksum_derived[i])
         {
             same = 0;
             break;
