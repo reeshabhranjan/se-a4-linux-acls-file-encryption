@@ -7,6 +7,7 @@
 #include "security.h"
 #include <string.h>
 #include "encrypt.h"
+#include "utils.h"
 
 int main(int argc, char* argv[])
 {
@@ -61,11 +62,11 @@ int main(int argc, char* argv[])
     char* buf = (char*) malloc(100000);
     memset(buf, 0, 100000);
 
-    int fd = open(filepath, O_RDONLY);
-    read(fd, buf, 100000);
+    int len_buf;
+    buf = read_from_file_with_num_bytes(filepath, &len_buf);
 
     printf("Attempting decryption...\n"); // TODO decrypt only if the true owner
-    char* plaintext = decrypt_string_trapdoor(buf);
+    char* plaintext = decrypt_string_trapdoor(buf, len_buf);
     free(buf);
     buf = NULL;
     buf = plaintext;    

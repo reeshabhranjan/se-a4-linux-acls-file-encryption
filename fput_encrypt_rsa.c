@@ -60,22 +60,24 @@ int main(int argc, char* argv[])
     fgets(s, 100000, stdin);
 
     printf("Encrypting...\n");
-    char* ciphertext = encrypt_string_trapdoor(s);
+    int ciphertext_len;
+    char* ciphertext = encrypt_string_trapdoor(s, &ciphertext_len);
     free(s);
     s = NULL;
     s = ciphertext;
 
-    write_to_file(filepath, s, 1);
+    write_to_file_with_len(filepath, s, ciphertext_len, 1);
 
     // create HMAC
-    char* checksum = create_hmac_trapdoor(s);
+    int checksum_len;
+    char* checksum = create_hmac_trapdoor(s, ciphertext_len, &checksum_len);
     char* checksum_file_name = concatenate_strings(filepath, ".sign");
     if (!file_exists(checksum_file_name))
     {
         // TODO what permissions to give to the checksum file
         create_file(checksum_file_name, getuid(), getgid(), 0644);
     }
-    write_to_file(checksum_file_name, checksum, 1);
+    write_to_file_with_len(checksum_file_name, checksum, checksum_len, 1);
 
     seteuid(getuid());
     printf("UID: %d EUID: %d\n", getuid(), geteuid());
