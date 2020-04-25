@@ -348,8 +348,10 @@ EVP_PKEY* read_rsa_private_key_from_file()
         exit(1);
     }
 
+
     FILE* rsa_pem_file = fopen(filepath_rsa_credentials, "r");
-    EVP_PKEY* rsa_private_key = PEM_read_PrivateKey(rsa_pem_file, &rsa_private_key, NULL, NULL);
+    EVP_PKEY* rsa_private_key = PEM_read_PrivateKey(rsa_pem_file, NULL, NULL, NULL);
+    printf("[!] encrypt.c read private key, before fopen\n");
 
     if (rsa_private_key == NULL)
     {
@@ -391,8 +393,9 @@ EVP_PKEY* read_rsa_public_key_from_file()
     return rsa_public_key;
 }
 
-char* create_hmac_trapdoor(char* buffer)
+char* create_hmac_trapdoor(char* buffer, int buffer_len, int* signature_len_return)
 {
+    printf("[!] encrypt.c hmac creation, hello\n");
     EVP_PKEY* private_key = read_rsa_private_key_from_file();
     EVP_MD_CTX* context = EVP_MD_CTX_create();
     
@@ -409,7 +412,7 @@ char* create_hmac_trapdoor(char* buffer)
         exit(1);
     }
 
-    result = EVP_DigestSignUpdate(context, buffer, strlen(buffer));
+    result = EVP_DigestSignUpdate(context, buffer, buffer_len);
 
     if (result != 1)
     {
@@ -441,6 +444,7 @@ char* create_hmac_trapdoor(char* buffer)
     // TODO call EVP_MD_CTX_destroy(context) everywhere
     // TODO check every free() call such that it doesn't free
     // a pointer passed into the functin
+    *signature_len_return = (int) sig_len;
     return string_signature;
 }
 

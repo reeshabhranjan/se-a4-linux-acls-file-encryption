@@ -33,6 +33,11 @@ int main()
     char* ciphertext = encrypt_string_trapdoor(plaintext, &ciphertext_len);
     printf("Hello\n");
     printf("Ciphertext len: %d\n", ciphertext_len);
+    int hmac_len;
+    char* hmac = create_hmac_trapdoor(ciphertext, ciphertext_len, &hmac_len);
+
+    printf_custom("hmac: ", hmac, hmac_len);
+
     char* plaintext_derived = decrypt_string_trapdoor(ciphertext, ciphertext_len);
     printf("derived plaintext: %s\n", plaintext_derived);
     
