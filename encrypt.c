@@ -248,6 +248,20 @@ int fverify(char* filepath)
     // TODO array of bytes v/s array of chars
     // TODO check for read permissions
     char* filepath_checksum = concatenate_strings(filepath, SIGNATURE_EXTENSION);
+
+    if (!file_exists(filepath_checksum))
+    {
+        printf("The checksum file [%s] does not exist\n", filepath_checksum);
+        exit(1);
+    }
+
+    char* caller_username = get_username();
+    if (!validate(caller_username, filepath_checksum, 100))
+    {
+        printf("You do not have read permissions on %s\n", filepath_checksum);
+        exit(1);
+    }
+
     int checksum_len_file;
     char* string_checksum_file = read_from_file_with_num_bytes(filepath_checksum, &checksum_len_file);
     int ciphertext_len;
