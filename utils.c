@@ -41,18 +41,22 @@ void write_to_file(char* filepath, char* buffer, int overwrite)
 
 void write_to_file_with_len(char* filepath, char* buffer, int len, int overwrite)
 {
-    int fd = -1;
-    if (overwrite)
-    {
-        fd = open(filepath, O_WRONLY | O_CREAT | O_TRUNC);
-    }
-    else
-    {
-        fd = open(filepath, O_WRONLY | O_APPEND | O_CREAT);
-    }
+    // int fd = -1;
+    // if (overwrite)
+    // {
+    //     fd = open(filepath, O_WRONLY | O_CREAT | O_TRUNC);
+    // }
+    // else
+    // {
+    //     fd = open(filepath, O_WRONLY | O_APPEND | O_CREAT);
+    // }
     
-    write(fd, buffer, len);
-    close(fd);
+    // write(fd, buffer, len);
+    // close(fd);
+
+    FILE* fp = fopen(filepath, "w");
+    fwrite(buffer, 1, len, fp);
+    fclose(fp);
 }
 
 void create_file(char* filepath, int owner_id, int group_id, int permissions)
@@ -65,6 +69,7 @@ void create_file(char* filepath, int owner_id, int group_id, int permissions)
 char* read_from_file(char* filepath)
 {
     char* buf = (char*) malloc(100000);
+    memset(buf, 0, 100000);
 
     int fd = open(filepath, O_RDONLY);
     read(fd, buf, 100000);
@@ -75,9 +80,24 @@ char* read_from_file(char* filepath)
 char* read_from_file_with_num_bytes(char* filepath, int* num_bytes_read)
 {
     char* buf = (char*) malloc(100000);
+    memset(buf, 0, 100000);
 
     int fd = open(filepath, O_RDONLY);
     *num_bytes_read = read(fd, buf, 100000);
     close(fd);
     return buf;
+
+    // FILE* fp = fopen(filepath, "r");
+    
+}
+
+void printf_custom(char* label, char* s, int len)
+{
+    printf("%s: ", label);
+    for (int i = 0; i < len; i++)
+    {
+        printf("%c", s[i]);
+    }
+    printf("\n");
+    
 }

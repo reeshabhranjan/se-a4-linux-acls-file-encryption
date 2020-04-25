@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
 
     // create HMAC
     int checksum_len;
-    char* checksum = fsign(s, &checksum_len);
+    char* checksum = fsign(s, strlen(s), &checksum_len);
     char* checksum_file_name = concatenate_strings(filepath, ".sign");
     if (!file_exists(checksum_file_name))
     {

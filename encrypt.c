@@ -50,7 +50,9 @@ void generate_key_iv_from_passphrase_and_salt(char** key, char** iv, char* passp
     // TODO is it safe to call strlen on salt?
     PKCS5_PBKDF2_HMAC_SHA1(passphrase, strlen(passphrase), salt, strlen(salt), 1024, KEY_SIZE_BITS / 8 + IV_SIZE_BITS / 8, key_iv);
     *key = substring(key_iv, 0, KEY_SIZE_BITS / 8);
-    *iv = substring(key_iv, KEY_SIZE_BITS / 8, KEY_SIZE_BITS / 8 + IV_SIZE_BITS / 8);    
+    *iv = substring(key_iv, KEY_SIZE_BITS / 8, KEY_SIZE_BITS / 8 + IV_SIZE_BITS / 8);
+    printf("[!] encrypt.c: key_generation: key size: %d\n", KEY_SIZE_BITS / 8);   
+    printf("[!] encrypt.c: key_generation:  iv size: %d\n", (KEY_SIZE_BITS / 8 + IV_SIZE_BITS / 8 - KEY_SIZE_BITS / 8));   
 }
 
 void generate_key_iv(char** key, char** iv)
@@ -62,6 +64,8 @@ void generate_key_iv(char** key, char** iv)
 
 char* encrypt_string(char* plaintext, char* key, char* iv, int* ciphertext_len_returned)
 {
+    printf("[!] encrypt_string key_len: %d\n", (int) strlen(key));
+    printf("[!] encrypt_string iv_len: %d\n", (int) strlen(iv));
     EVP_CIPHER_CTX *context;
     context = EVP_CIPHER_CTX_new();
     
@@ -79,6 +83,7 @@ char* encrypt_string(char* plaintext, char* key, char* iv, int* ciphertext_len_r
     }
 
     char* ciphertext = (char*) malloc(100000);
+    memset(ciphertext, 0, 100000);
     int ciphertext_len = 0;
 
     result = EVP_EncryptUpdate(context, ciphertext, &ciphertext_len, plaintext, strlen(plaintext));
@@ -88,6 +93,8 @@ char* encrypt_string(char* plaintext, char* key, char* iv, int* ciphertext_len_r
         perror("Couldn't complete encryption rounds.");
         exit(1);
     }
+    *ciphertext_len_returned = 0;
+    *ciphertext_len_returned += ciphertext_len;
 
     result = EVP_EncryptFinal_ex(context, ciphertext + ciphertext_len, &ciphertext_len);
 
@@ -97,9 +104,8 @@ char* encrypt_string(char* plaintext, char* key, char* iv, int* ciphertext_len_r
         exit(1);
     }
 
+    *ciphertext_len_returned += ciphertext_len;
     EVP_CIPHER_CTX_free(context);
-
-    *ciphertext_len_returned = ciphertext_len;
     return ciphertext;
 }
 
@@ -124,6 +130,7 @@ char* decrypt_string(char* ciphertext, char* key, char* iv, int ciphertext_len)
     }
 
     char* plaintext = (char*) malloc(100000);
+    memset(plaintext, 0, 100000);
     int plaintext_len = 0;
 
     result = EVP_DecryptUpdate(context, plaintext, &plaintext_len, ciphertext, ciphertext_len);
@@ -139,6 +146,7 @@ char* decrypt_string(char* ciphertext, char* key, char* iv, int ciphertext_len)
     if (result != 1)
     {
         perror("Cannot decrypt final step.");
+        ERR_print_errors_fp(stderr);
         exit(1);
     }
 
@@ -147,7 +155,7 @@ char* decrypt_string(char* ciphertext, char* key, char* iv, int ciphertext_len)
     return plaintext;
 }
 
-char* fsign(char* buffer, int* checksum_len_return)
+char* fsign(char* buffer, int buffer_len, int* checksum_len_return)
 {
     // TODO error handling
     // TODO check for read and write permissions
@@ -188,7 +196,8 @@ char* fsign(char* buffer, int* checksum_len_return)
         exit(1);
     }
 
-    result = EVP_DigestSignUpdate(context, buffer, strlen(buffer));
+    result = EVP_DigestSignUpdate(context, buffer, buffer_len);
+    printf("[!] encrypt.c fsign: length of buffer: %d\n", buffer_len);
 
     if (result != 1)
     {
@@ -234,9 +243,17 @@ int fverify(char* filepath)
     char* filepath_checksum = concatenate_strings(filepath, SIGNATURE_EXTENSION);
     int checksum_len_file;
     char* string_checksum_file = read_from_file_with_num_bytes(filepath_checksum, &checksum_len_file);
-    char* content = read_from_file(filepath);
+    int ciphertext_len;
+    char* content = read_from_file_with_num_bytes(filepath, &ciphertext_len);
+    // printf("[!] encrypt.c fverify: ciphertext read: %s\n", content);
+    printf_custom("[!] encrypt.c fverify: ciphertext read", content, ciphertext_len);
     int checksum_len_derived;
-    char* string_checksum_derived = fsign(content, &checksum_len_derived);
+    char* string_checksum_derived = fsign(content, ciphertext_len, &checksum_len_derived);
+
+    printf("[!] encryp.c verification: file check sum:    %s\n", string_checksum_file);
+    printf("[!] encryp.c verification: derived check sum: %s\n", string_checksum_derived);
+
+    printf("[!] encrypt.c checksum length retrieved: %d\n", checksum_len_file);
 
     if (checksum_len_derived != checksum_len_file)
     {
@@ -259,12 +276,13 @@ int fverify(char* filepath)
 
 char* gen_rand(int length)
 {
-    char* random_string = (char*) malloc(length);
+    char* random_string = (char*) malloc(length + 1);
     for (int i = 0; i < length; i++)
     {
         random_string[i] = '0' + (rand()%10);
     }
     
+    random_string[length] = '\0';
     return random_string;
 }
 
@@ -278,17 +296,31 @@ char* encrypt_string_trapdoor(char* buffer, int* ciphertext_len_return)
     char* key;
     char* iv;
     generate_key_iv(&key, &iv);
+    key = "xxxxxxxxxxxxxxxx";
+    iv = "xxxxxxxxxxxxxxxx";
+    // key = "key123";
+    // iv = "iv123";
+    char* dummy_remove;
     if (!file_exists(filepath_random))
     {
         create_file(filepath_random, getuid(), getgid(), 0644); // TODO permission needs to be set accordingly?
         // TODO setacl
         char* string_random_number = gen_rand(64);
+        printf("[!] encrypt.c: random_number generated: %s\n", string_random_number);
         int ciphertext_len;
         char* string_random_number_encrypted = encrypt_string(string_random_number, key, iv, &ciphertext_len);
-        write_to_file_with_len(filepath_random, string_random_number_encrypted, 1, ciphertext_len);
+        printf("[!] encrypt.c: created encrypted random file with bytes: %d\n", ciphertext_len);
+        printf("[!] encypt.c: key used for encrypting: %s", key);
+        printf("[!] encypt.c: iv used for encrypting: %s", iv);
+        write_to_file_with_len(filepath_random, string_random_number_encrypted, ciphertext_len, 1);
+        dummy_remove = string_random_number_encrypted;
     }
     int ciphertext_len_random;
     char* string_random_number_encrypted = read_from_file_with_num_bytes(filepath_random, &ciphertext_len_random);
+    string_random_number_encrypted = dummy_remove;
+    printf("[!] encrypt.c ciphertext_len_random: %d\n", ciphertext_len_random);
+    printf("[!] encypt.c: key used for decrypting: %s", key);
+    printf("[!] encypt.c: iv used for decrypting: %s", iv);
     char* string_random_number = decrypt_string(string_random_number_encrypted, key, iv, ciphertext_len_random);
 
     // TODO make sure you are not changing the key and iv variables
@@ -492,6 +524,8 @@ char* decrypt_string_trapdoor(char* ciphertext, int ciphertext_len)
     char* key;
     char* iv;
     generate_key_iv(&key, &iv);
+    key = "xxxxxxxxxxxxxxxx";
+    iv = "xxxxxxxxxxxxxxxx";
 
     int ciphertext_len_random;
     char* string_random_encrypted = read_from_file_with_num_bytes(filepath_random_number, &ciphertext_len_random);

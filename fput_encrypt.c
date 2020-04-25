@@ -56,6 +56,7 @@ int main(int argc, char* argv[])
 
     printf("Enter a string (under 100000 characters)\n");
     char* s = (char*) malloc(100000);
+    memset(s, 0, 100000);
     fgets(s, 100000, stdin);
 
     printf("Encrypting...\n");
@@ -70,10 +71,12 @@ int main(int argc, char* argv[])
     s = ciphertext;
 
     write_to_file_with_len(filepath, s, ciphertext_len, 1);
+    // printf("[!] fput_encrypt: wrote ciphertext: %s\n", s);
+    printf_custom("[!] fput_encrypt: wrote ciphertext", s, ciphertext_len);
 
     // create HMAC
     int checksum_len;
-    char* checksum = fsign(s, &checksum_len);
+    char* checksum = fsign(s, ciphertext_len, &checksum_len);
     char* checksum_file_name = concatenate_strings(filepath, ".sign");
     if (!file_exists(checksum_file_name))
     {
@@ -81,7 +84,8 @@ int main(int argc, char* argv[])
         create_file(checksum_file_name, getuid(), getgid(), 0644);
     }
     write_to_file_with_len(checksum_file_name, checksum, checksum_len, 1);
-    // printf("[!] fput_encrypt.c: number of bytes written: %d\n", checksum_len);
+    printf("[!] fput_encrypt.c: checksum length written: %d\n", checksum_len);
+    printf("[!] fput_encrypt.c: checksum written: %s\n", checksum);
 
     seteuid(getuid());
     printf("UID: %d EUID: %d\n", getuid(), geteuid());

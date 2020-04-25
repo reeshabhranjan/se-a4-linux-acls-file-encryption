@@ -59,6 +59,7 @@ int main(int argc, char* argv[])
     }
 
     char* buf = (char*) malloc(100000);
+    memset(buf, 0, 100000);
 
     int fd = open(filepath, O_RDONLY);
     read(fd, buf, 100000);

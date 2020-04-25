@@ -56,6 +56,7 @@ int main(int argc, char* argv[])
 
     printf("Enter a string (under 100000 characters)\n");
     char* s = (char*) malloc(100000);
+    memset(s, 0, 100000);
     fgets(s, 100000, stdin);
 
     printf("Encrypting...\n");
