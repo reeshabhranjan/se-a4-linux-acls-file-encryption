@@ -4,6 +4,7 @@
 #include <string.h>
 #include "encrypt.h"
 #include "utils.h"
+#include "acl.h"
 
 int main()
 {
@@ -28,19 +29,46 @@ int main()
     // }
     // printf("\n%d\n", num_bytes);
 
+    // printf("Hello\n");
+    // printf("Ciphertext len: %d\n", ciphertext_len);
+
+    // printf_custom("hmac: ", hmac, hmac_len);
+    // printf("derived plaintext: %s\n", plaintext_derived);
+    
+
     char* plaintext = "Helloooo";
     int ciphertext_len;
     char* ciphertext = encrypt_string_trapdoor(plaintext, &ciphertext_len);
-    printf("Hello\n");
-    printf("Ciphertext len: %d\n", ciphertext_len);
     int hmac_len;
     char* hmac = create_hmac_trapdoor(ciphertext, ciphertext_len, &hmac_len);
-
-    printf_custom("hmac: ", hmac, hmac_len);
-
     char* plaintext_derived = decrypt_string_trapdoor(ciphertext, ciphertext_len);
-    printf("derived plaintext: %s\n", plaintext_derived);
-    
-    
+
+    printf("encryption done\n");
+
+    char* file_name = "part-2/rsa.txt";
+    char* hmac_file = "part-2/rsa.txt.sign";
+
+    if (!file_exists(file_name))
+    {
+        // TODO add ACL support in create file
+        // TODO fix mistakes in assignment 2
+        create_file(file_name, getuid(), getgid(), 0644);
+    }
+
+    if (!file_exists(hmac_file))
+    {
+        create_file(hmac_file, getuid(), getgid(), 0644);
+    }
+
+    write_to_file_with_len(file_name, ciphertext, ciphertext_len, 1);
+    write_to_file_with_len(hmac_file, hmac, hmac_len, 1);
+
+    int result = verify_hmac_trapdoor(file_name);
+
+    printf("Result: %d\n", result);
+
+    // TODO make setup.sh instead of make setup
+
+
     return 0;
 }

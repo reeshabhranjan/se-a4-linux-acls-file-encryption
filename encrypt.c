@@ -339,6 +339,7 @@ EVP_PKEY* read_rsa_private_key_from_file()
     char* dummy = filepath_rsa_credentials;
     filepath_rsa_credentials = concatenate_strings(filepath_rsa_credentials, RSA_FILE_EXTENSION);
     free(dummy);
+    filepath_rsa_credentials = "part-2/private.pem";
 
     if (!file_exists(filepath_rsa_credentials))
     {
@@ -371,6 +372,7 @@ EVP_PKEY* read_rsa_public_key_from_file()
     char* dummy = filepath_rsa_credentials;
     filepath_rsa_credentials = concatenate_strings(filepath_rsa_credentials, RSA_FILE_EXTENSION);
     free(dummy);
+    filepath_rsa_credentials = "part-2/public.pem";
 
     if (!file_exists(filepath_rsa_credentials))
     {
@@ -381,11 +383,16 @@ EVP_PKEY* read_rsa_public_key_from_file()
     }
 
     FILE* rsa_pem_file = fopen(filepath_rsa_credentials, "r");
+    // EVP_PKEY* rsa_public_key = PEM_read_PUBKEY(rsa_pem_file, NULL, NULL, NULL);
+    // EVP_PKEY* rsa_public_key = EVP_PKEY_new();
+    // RSA* rsa_public_key_RSA_structure = PEM_read_RSAPublicKey(rsa_pem_file, NULL, NULL, NULL);
+    // EVP_PKEY_assign_RSA(rsa_public_key, rsa_public_key_RSA_structure);
+    // EVP_PKEY* rsa_public_key = PEM_read_PrivateKey(rsa_pem_file, NULL, NULL, NULL);
     EVP_PKEY* rsa_public_key = PEM_read_PUBKEY(rsa_pem_file, NULL, NULL, NULL);
 
     if (rsa_public_key == NULL)
     {
-        printf("Cannot read RSA private key\n");
+        printf("Cannot read RSA public key\n");
         exit(1);
     }
 
@@ -444,6 +451,7 @@ char* create_hmac_trapdoor(char* buffer, int buffer_len, int* signature_len_retu
     // TODO call EVP_MD_CTX_destroy(context) everywhere
     // TODO check every free() call such that it doesn't free
     // a pointer passed into the functin
+    EVP_MD_CTX_destroy(context);
     *signature_len_return = (int) sig_len;
     return string_signature;
 }
@@ -472,10 +480,12 @@ int verify_hmac_trapdoor(char* filepath)
 
     int signature_len;
     char* string_signature = read_from_file_with_num_bytes(filepath_signature, &signature_len);
-
     EVP_PKEY* public_key = read_rsa_public_key_from_file();
+    printf("[!] encrypt.c trapdoor verify: after readin public key\n");
 
     EVP_MD_CTX* context = EVP_MD_CTX_create();
+
+    printf("[!] encrypt.c trapdoor verify: after creating MD context.\n");
 
     if (context == NULL)
     {
@@ -500,7 +510,9 @@ int verify_hmac_trapdoor(char* filepath)
     }
 
     // TODO fix this
+    printf("here\n");
     result = EVP_DigestVerifyFinal(context, string_signature, signature_len);
+    EVP_MD_CTX_destroy(context);
 
     return result;
 }
