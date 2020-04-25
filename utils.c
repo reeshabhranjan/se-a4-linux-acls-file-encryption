@@ -39,6 +39,22 @@ void write_to_file(char* filepath, char* buffer, int overwrite)
     close(fd);
 }
 
+void write_to_file_with_len(char* filepath, char* buffer, int len, int overwrite)
+{
+    int fd = -1;
+    if (overwrite)
+    {
+        fd = open(filepath, O_WRONLY | O_CREAT | O_TRUNC);
+    }
+    else
+    {
+        fd = open(filepath, O_WRONLY | O_APPEND | O_CREAT);
+    }
+    
+    write(fd, buffer, len);
+    close(fd);
+}
+
 void create_file(char* filepath, int owner_id, int group_id, int permissions)
 {
     int fd = open(filepath, O_CREAT, permissions);
