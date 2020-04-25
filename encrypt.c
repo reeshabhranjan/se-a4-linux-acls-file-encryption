@@ -23,7 +23,8 @@ const int IV_SIZE_BITS = 128; // bits
 #define SIGNATURE_EXTENSION ".sign"
 #define RANDOM_NUM_EXTENSION ".rand"
 #define PART_2_SUB_DIRECTORY "part-2/"
-#define RSA_FILE_EXTENSION ".pem"
+#define RSA_PUBLIC_KEY_FILE_EXTENSION ".public"
+#define RSA_PRIVATE_KEY_FILE_EXTENSION ".private"
 
 // functions for encryption-decryption and sign-verify
 
@@ -337,15 +338,16 @@ EVP_PKEY* read_rsa_private_key_from_file()
     // TODO replace the path with home directory
     char* filepath_rsa_credentials = concatenate_strings(PART_2_SUB_DIRECTORY, get_username());
     char* dummy = filepath_rsa_credentials;
-    filepath_rsa_credentials = concatenate_strings(filepath_rsa_credentials, RSA_FILE_EXTENSION);
+    filepath_rsa_credentials = concatenate_strings(filepath_rsa_credentials, RSA_PRIVATE_KEY_FILE_EXTENSION);
     free(dummy);
-    filepath_rsa_credentials = "part-2/private.pem";
+    // filepath_rsa_credentials = "part-2/private.pem";
+    // dummy = filepath_rsa_credentials;
 
     if (!file_exists(filepath_rsa_credentials))
     {
         // TODO assume that the current user will always have a file with his/her name
         // and the related permissions?
-        printf("There is no RSA public-private key pair file correspnding to current user\n");
+        printf("Missing file: %s\n", filepath_rsa_credentials);
         exit(1);
     }
 
@@ -370,15 +372,15 @@ EVP_PKEY* read_rsa_public_key_from_file()
     // TODO replace the path with home directory
     char* filepath_rsa_credentials = concatenate_strings(PART_2_SUB_DIRECTORY, get_username());
     char* dummy = filepath_rsa_credentials;
-    filepath_rsa_credentials = concatenate_strings(filepath_rsa_credentials, RSA_FILE_EXTENSION);
+    filepath_rsa_credentials = concatenate_strings(filepath_rsa_credentials, RSA_PUBLIC_KEY_FILE_EXTENSION);
     free(dummy);
-    filepath_rsa_credentials = "part-2/public.pem";
+    // filepath_rsa_credentials = "part-2/public.pem";
 
     if (!file_exists(filepath_rsa_credentials))
     {
         // TODO assume that the current user will always have a file with his/her name
         // and the related permissions?
-        printf("There is no RSA public-private key pair file correspnding to current user\n");
+        printf("Missing file: %s\n", filepath_rsa_credentials);
         exit(1);
     }
 
