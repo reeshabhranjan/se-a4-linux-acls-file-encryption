@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
 
     int len_buf;
     char* buf = read_from_file_with_num_bytes(filepath, &len_buf);
-    // printf("[!] fget_decrypt.c: number of bytes read: %d\n", len_buf);
+    // // printf("[!] fget_decrypt.c: number of bytes read: %d\n", len_buf);
 
     printf("Attempting decryption...\n"); // TODO decrypt only if the true owner
     char* key;

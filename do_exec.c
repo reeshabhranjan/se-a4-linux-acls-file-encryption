@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
         execv(filepath, argv + 1);
         perror("Invalid executable path.");
         seteuid(getuid());
-        printf("[CHILD]: UID: %d EUID: %d\n", getuid(), geteuid());
+        // printf("[CHILD]: UID: %d EUID: %d\n", getuid(), geteuid());
         exit(1);
     }
 
@@ -68,7 +68,7 @@ int main(int argc, char* argv[])
         seteuid(getuid());
     }
 
-    printf("[PARENT]: UID: %d EUID: %d\n", getuid(), geteuid());
+    // printf("[PARENT]: UID: %d EUID: %d\n", getuid(), geteuid());
 
     return 0;
 }

@@ -71,8 +71,8 @@ int main(int argc, char* argv[])
     s = ciphertext;
 
     write_to_file_with_len(filepath, s, ciphertext_len, 1);
-    // printf("[!] fput_encrypt: wrote ciphertext: %s\n", s);
-    printf_custom("[!] fput_encrypt: wrote ciphertext", s, ciphertext_len);
+    // // printf("[!] fput_encrypt: wrote ciphertext: %s\n", s);
+    // printf_custom("[!] fput_encrypt: wrote ciphertext", s, ciphertext_len);
 
     // create HMAC
     int checksum_len;
@@ -84,8 +84,8 @@ int main(int argc, char* argv[])
         create_file(checksum_file_name, getuid(), getgid(), 0644);
     }
     write_to_file_with_len(checksum_file_name, checksum, checksum_len, 1);
-    printf("[!] fput_encrypt.c: checksum length written: %d\n", checksum_len);
-    printf("[!] fput_encrypt.c: checksum written: %s\n", checksum);
+    // printf("[!] fput_encrypt.c: checksum length written: %d\n", checksum_len);
+    // printf("[!] fput_encrypt.c: checksum written: %s\n", checksum);
 
     seteuid(getuid());
     printf("UID: %d EUID: %d\n", getuid(), geteuid());
