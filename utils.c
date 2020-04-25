@@ -71,3 +71,13 @@ char* read_from_file(char* filepath)
     close(fd);
     return buf;
 }
+
+char* read_from_file_with_num_bytes(char* filepath, int* num_bytes_read)
+{
+    char* buf = (char*) malloc(100000);
+
+    int fd = open(filepath, O_RDONLY);
+    *num_bytes_read = read(fd, buf, 100000);
+    close(fd);
+    return buf;
+}

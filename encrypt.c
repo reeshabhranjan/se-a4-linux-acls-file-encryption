@@ -60,7 +60,7 @@ void generate_key_iv(char** key, char** iv)
     generate_key_iv_from_passphrase_and_salt(key, iv, passphrase, salt);
 }
 
-char* encrypt_string(char* plaintext, char* key, char* iv)
+char* encrypt_string(char* plaintext, char* key, char* iv, int* ciphertext_len_returned)
 {
     EVP_CIPHER_CTX *context;
     context = EVP_CIPHER_CTX_new();
@@ -99,6 +99,7 @@ char* encrypt_string(char* plaintext, char* key, char* iv)
 
     EVP_CIPHER_CTX_free(context);
 
+    *ciphertext_len_returned = ciphertext_len;
     return ciphertext;
 }
 
@@ -269,8 +270,9 @@ char* encrypt_string_trapdoor(char* buffer)
         create_file(filepath_random, getuid(), getgid(), 0644); // TODO permission needs to be set accordingly?
         // TODO setacl
         char* string_random_number = gen_rand(64);
-        char* string_random_number_encrypted = encrypt_string(string_random_number, key, iv);
-        write_to_file(filepath_random, string_random_number_encrypted, 1);
+        int ciphertext_len;
+        char* string_random_number_encrypted = encrypt_string(string_random_number, key, iv, &ciphertext_len);
+        write_to_file_with_len(filepath_random, string_random_number_encrypted, 1, ciphertext_len);
     }
     char* string_random_number_encrypted = read_from_file(filepath_random);
     char* string_random_number = decrypt_string(string_random_number_encrypted, key, iv);
@@ -284,7 +286,8 @@ char* encrypt_string_trapdoor(char* buffer)
     char* iv_trapdoor;
     generate_key_iv_from_passphrase_and_salt(&key_trapdoor, &iv_trapdoor, string_random_number, get_username());
 
-    char* string_encrypted_trapdoor = encrypt_string(buffer, key_trapdoor, iv_trapdoor);
+    int ciphertext_len;
+    char* string_encrypted_trapdoor = encrypt_string(buffer, key_trapdoor, iv_trapdoor, &ciphertext_len);
     return string_encrypted_trapdoor;
 }
 
@@ -312,6 +315,8 @@ EVP_PKEY* read_rsa_private_key_from_file()
         printf("Cannot read RSA private key\n");
         exit(1);
     }
+
+    fclose(rsa_pem_file);
 
     return rsa_private_key;
 }
@@ -341,6 +346,7 @@ EVP_PKEY* read_rsa_public_key_from_file()
         exit(1);
     }
 
+    fclose(rsa_pem_file);
     return rsa_public_key;
 }
 
@@ -371,7 +377,7 @@ char* create_hmac_trapdoor(char* buffer)
     }
 
     // this call is needed to check the length of the signature
-    int sig_len;
+    size_t sig_len;
 
     result = EVP_DigestSignFinal(context, NULL, &sig_len);
 
@@ -389,7 +395,7 @@ char* create_hmac_trapdoor(char* buffer)
         exit(1);
     }
 
-    result = EVP_DigestSignFinal(context, string_signature, sig_len);
+    result = EVP_DigestSignFinal(context, string_signature, &sig_len);
 
     // TODO call EVP_MD_CTX_destroy(context) everywhere
     // TODO check every free() call such that it doesn't free

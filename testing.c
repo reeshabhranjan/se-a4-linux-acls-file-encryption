@@ -18,13 +18,15 @@ int main()
     printf("Plaintext2: %s\n", plaintext2); */
     // fsign("Hello", "checksum2.txt");
     // printf("%d\n", fverify("abc2.txt"));
-    char stuff[20] = "123\0\0123123";
-    write_to_file_with_len("stuff.txt", stuff, 12, 1);
-    char* restuff = read_from_file("stuff.txt");
-    for (int i = 0; i < 12; i++)
+    char stuff[11] = "123\0\0123123";
+    write_to_file_with_len("stuff.txt", stuff, 11, 1);
+    int num_bytes;
+    char* restuff = read_from_file_with_num_bytes("stuff.txt", &num_bytes);
+    for (int i = 0; i < 11; i++)
     {
         printf("%c", restuff[i]);
     }
+    printf("\n%d\n", num_bytes);
     
     return 0;
 }

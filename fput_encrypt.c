@@ -63,7 +63,8 @@ int main(int argc, char* argv[])
     char* iv;
 
     generate_key_iv(&key, &iv);
-    char* ciphertext = encrypt_string(s, key, iv);
+    int ciphertext_len;
+    char* ciphertext = encrypt_string(s, key, iv, &ciphertext_len);
     free(s);
     s = NULL;
     s = ciphertext;
