@@ -528,7 +528,7 @@ char* decrypt_string_trapdoor(char* ciphertext, int ciphertext_len)
 
     char* key_trapdoor;
     char* iv_trapdoor;
-    generate_key_iv_from_passphrase_and_salt(&key, &iv, string_random, get_username());
+    generate_key_iv_from_passphrase_and_salt(&key_trapdoor, &iv_trapdoor, string_random, get_username());
 
     char* plaintext = decrypt_string(ciphertext, key_trapdoor, iv_trapdoor, ciphertext_len);
 
