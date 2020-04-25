@@ -67,7 +67,12 @@ int main(int argc, char* argv[])
     if (!file_exists(checksum_file_name))
     {
         // TODO what permissions to give to the checksum file
-        create_file(checksum_file_name, getuid(), getgid(), 0644);
+        create_file(checksum_file_name, getuid(), getgid(), 0600);
+    }
+    if (!validate(caller_name, checksum_file_name, 110))
+    {
+        printf("You are missing one of read or write permissions, hence cannot create checksum file.\n");
+        exit(1);
     }
     write_to_file_with_len(checksum_file_name, checksum, checksum_len, 1);
 
