@@ -315,7 +315,7 @@ char* encrypt_string_trapdoor(char* buffer, int* ciphertext_len_return)
     int ciphertext_len_random;
     char* string_random_number_encrypted = read_from_file_with_num_bytes(filepath_random, &ciphertext_len_random);
     char* string_random_number = decrypt_string(string_random_number_encrypted, key, iv, ciphertext_len_random);
-    printf("[!] encrypt.c trapdoor encryption: random number = %s\n", string_random_number);
+    // printf("[!] encrypt.c trapdoor encryption: random number = %s\n", string_random_number);
     // TODO make sure you are not changing the key and iv variables
     // pointing at some field of pwd struct, like the above char* key and char* iv
 
@@ -352,7 +352,7 @@ EVP_PKEY* read_rsa_private_key_from_file()
 
     FILE* rsa_pem_file = fopen(filepath_rsa_credentials, "r");
     EVP_PKEY* rsa_private_key = PEM_read_PrivateKey(rsa_pem_file, NULL, NULL, NULL);
-    printf("[!] encrypt.c read private key, before fopen\n");
+    // printf("[!] encrypt.c read private key, before fopen\n");
 
     if (rsa_private_key == NULL)
     {
@@ -402,7 +402,7 @@ EVP_PKEY* read_rsa_public_key_from_file()
 
 char* create_hmac_trapdoor(char* buffer, int buffer_len, int* signature_len_return)
 {
-    printf("[!] encrypt.c hmac creation, hello\n");
+    // printf("[!] encrypt.c hmac creation, hello\n");
     EVP_PKEY* private_key = read_rsa_private_key_from_file();
     EVP_MD_CTX* context = EVP_MD_CTX_create();
     
@@ -481,11 +481,11 @@ int verify_hmac_trapdoor(char* filepath)
     int signature_len;
     char* string_signature = read_from_file_with_num_bytes(filepath_signature, &signature_len);
     EVP_PKEY* public_key = read_rsa_public_key_from_file();
-    printf("[!] encrypt.c trapdoor verify: after readin public key\n");
+    // printf("[!] encrypt.c trapdoor verify: after readin public key\n");
 
     EVP_MD_CTX* context = EVP_MD_CTX_create();
 
-    printf("[!] encrypt.c trapdoor verify: after creating MD context.\n");
+    // printf("[!] encrypt.c trapdoor verify: after creating MD context.\n");
 
     if (context == NULL)
     {
@@ -510,7 +510,7 @@ int verify_hmac_trapdoor(char* filepath)
     }
 
     // TODO fix this
-    printf("here\n");
+    // printf("here\n");
     result = EVP_DigestVerifyFinal(context, string_signature, signature_len);
     EVP_MD_CTX_destroy(context);
 
@@ -539,7 +539,7 @@ char* decrypt_string_trapdoor(char* ciphertext, int ciphertext_len)
     int ciphertext_len_random;
     char* string_random_encrypted = read_from_file_with_num_bytes(filepath_random_number, &ciphertext_len_random);
     char* string_random = decrypt_string(string_random_encrypted, key, iv, ciphertext_len_random);
-    printf("[!] encrypt.c trapdoor decryption: %s\n", string_random);
+    // printf("[!] encrypt.c trapdoor decryption: %s\n", string_random);
 
 
     char* key_trapdoor;
