@@ -381,7 +381,7 @@ EVP_PKEY* read_rsa_public_key_from_file()
     }
 
     FILE* rsa_pem_file = fopen(filepath_rsa_credentials, "r");
-    EVP_PKEY* rsa_public_key = PEM_read_PUBKEY(rsa_pem_file, &rsa_public_key, NULL, NULL);
+    EVP_PKEY* rsa_public_key = PEM_read_PUBKEY(rsa_pem_file, NULL, NULL, NULL);
 
     if (rsa_public_key == NULL)
     {
