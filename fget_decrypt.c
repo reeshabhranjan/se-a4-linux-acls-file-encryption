@@ -7,6 +7,7 @@
 #include "security.h"
 #include <string.h>
 #include "encrypt.h"
+#include "utils.h"
 
 int main(int argc, char* argv[])
 {
@@ -58,19 +59,17 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    char* buf = (char*) malloc(100000);
-
-    int fd = open(filepath, O_RDONLY);
-    read(fd, buf, 100000);
+    int len_buf;
+    char* buf = read_from_file_with_num_bytes(filepath, &len_buf);
 
     printf("Attempting decryption...\n"); // TODO decrypt only if the true owner
     char* key;
     char* iv;
     generate_key_iv(&key, &iv);
-    char* plaintext = decrypt_string(buf, key, iv);
+    char* plaintext = decrypt_string(buf, key, iv, len_buf);
     free(buf);
     buf = NULL;
-    buf = plaintext;    
+    buf = plaintext;
 
     printf("%s", buf);
 

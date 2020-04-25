@@ -103,8 +103,9 @@ char* encrypt_string(char* plaintext, char* key, char* iv, int* ciphertext_len_r
     return ciphertext;
 }
 
-char* decrypt_string(char* ciphertext, char* key, char* iv)
+char* decrypt_string(char* ciphertext, char* key, char* iv, int ciphertext_len)
 {
+    // TODO add null byte after ciphertext?
     EVP_CIPHER_CTX *context;
     context = EVP_CIPHER_CTX_new(); // TODO can the context be shared between encr and decr?
     
@@ -125,7 +126,7 @@ char* decrypt_string(char* ciphertext, char* key, char* iv)
     char* plaintext = (char*) malloc(100000);
     int plaintext_len = 0;
 
-    result = EVP_DecryptUpdate(context, plaintext, &plaintext_len, ciphertext, strlen(ciphertext));
+    result = EVP_DecryptUpdate(context, plaintext, &plaintext_len, ciphertext, ciphertext_len);
 
     if (result != 1)
     {
@@ -146,7 +147,7 @@ char* decrypt_string(char* ciphertext, char* key, char* iv)
     return plaintext;
 }
 
-char* fsign(char* buffer)
+char* fsign(char* buffer, int* checksum_len_return)
 {
     // TODO error handling
     // TODO check for read and write permissions
@@ -221,14 +222,7 @@ char* fsign(char* buffer)
         exit(1);
     }
 
-
-/*     char* signature_file_name = concatenate_strings(filepath, ".sign");
-
-    if (!file_exists(signature_file_name))
-    {
-        create_file(signature_file_name, getuid(), getgid(), 0644);
-    }
-    write_to_file(signature_file_name, checksum); */
+    *checksum_len_return = checksumlen;
 
     return checksum;
 }
@@ -238,10 +232,29 @@ int fverify(char* filepath)
     // TODO array of bytes v/s array of chars
     // TODO check for read permissions
     char* filepath_checksum = concatenate_strings(filepath, SIGNATURE_EXTENSION);
-    char* checksum_file = read_from_file(filepath_checksum);
+    int checksum_len_file;
+    char* checksum_file = read_from_file_with_num_bytes(filepath_checksum, &checksum_len_file);
     char* content = read_from_file(filepath);
-    char* checksum_derived = fsign(content);
-    return (strcmp(checksum_file, checksum_derived) == 0);
+    int checksum_len_derived;
+    char* checksum_derived = fsign(content, &checksum_len_derived);
+
+    if (checksum_len_derived != checksum_len_file)
+    {
+        printf("The checksum length doesnt match for %s\n", filepath_checksum);
+        exit(1);
+    }
+
+    int same = 1;
+
+    for (int i = 0; i < checksum_len_derived; i++)
+    {
+        if (checksum_file[i] != checksum_derived[i])
+        {
+            same = 0;
+            break;
+        }
+    }
+    return same;
 }
 
 char* gen_rand(int length)
@@ -255,7 +268,7 @@ char* gen_rand(int length)
     return random_string;
 }
 
-char* encrypt_string_trapdoor(char* buffer)
+char* encrypt_string_trapdoor(char* buffer, int* ciphertext_len_return)
 {
     int n = strlen(buffer);
     char* filepath_random = concatenate_strings(PART_2_SUB_DIRECTORY, get_username());
@@ -274,8 +287,9 @@ char* encrypt_string_trapdoor(char* buffer)
         char* string_random_number_encrypted = encrypt_string(string_random_number, key, iv, &ciphertext_len);
         write_to_file_with_len(filepath_random, string_random_number_encrypted, 1, ciphertext_len);
     }
-    char* string_random_number_encrypted = read_from_file(filepath_random);
-    char* string_random_number = decrypt_string(string_random_number_encrypted, key, iv);
+    int ciphertext_len_random;
+    char* string_random_number_encrypted = read_from_file_with_num_bytes(filepath_random, &ciphertext_len_random);
+    char* string_random_number = decrypt_string(string_random_number_encrypted, key, iv, ciphertext_len_random);
 
     // TODO make sure you are not changing the key and iv variables
     // pointing at some field of pwd struct, like the above char* key and char* iv
@@ -288,6 +302,8 @@ char* encrypt_string_trapdoor(char* buffer)
 
     int ciphertext_len;
     char* string_encrypted_trapdoor = encrypt_string(buffer, key_trapdoor, iv_trapdoor, &ciphertext_len);
+    *ciphertext_len_return = ciphertext_len;
+
     return string_encrypted_trapdoor;
 }
 
@@ -405,32 +421,6 @@ char* create_hmac_trapdoor(char* buffer)
 
 int verify_hmac_trapdoor(char* filepath)
 {
-
-    // derive the symmetric key
-    char* filepath_random_number = concatenate_strings(PART_2_SUB_DIRECTORY, get_username());
-    char* dummy = filepath_random_number;
-    filepath_random_number = concatenate_strings(filepath_random_number, RANDOM_NUM_EXTENSION);
-    free(dummy);
-    char* key_user;
-    char* iv_user;
-    generate_key_iv(&key_user, &iv_user);
-
-    if (!file_exists(filepath_random_number))
-    {
-        printf("The random-number file does not exist.\n");
-        exit(1);
-    }
-
-    char* string_random_encrypted = read_from_file(filepath_random_number);
-    char* string_random = decrypt_string(string_random_encrypted, key_user, iv_user);
-
-    char* key_trapdoor;
-    char* iv_trapdoor;
-
-    generate_key_iv_from_passphrase_and_salt(&key_trapdoor, &iv_trapdoor, string_random, get_username());
-
-
-
     // recalculate the signature from data file
     if (!file_exists(filepath))
     {
@@ -438,11 +428,8 @@ int verify_hmac_trapdoor(char* filepath)
         exit(1);
     }
 
-    char* string_content_encrypted = read_from_file(filepath);
-
-    // decrypt the contents
-    char* string_content = decrypt_string(string_content_encrypted, key_trapdoor, iv_trapdoor);
-    char* string_checksum_content = create_hmac_trapdoor(string_content);
+    int message_len;
+    char* string_message = read_from_file_with_num_bytes(filepath, &message_len);
 
     // start verification
 
@@ -453,6 +440,9 @@ int verify_hmac_trapdoor(char* filepath)
         printf("verify_hmac_trapdoor: cannot find the required signature file\n");
         exit(1);
     }
+
+    int signature_len;
+    char* string_signature = read_from_file_with_num_bytes(filepath_signature, &signature_len);
 
     EVP_PKEY* public_key = read_rsa_public_key_from_file();
 
@@ -472,7 +462,7 @@ int verify_hmac_trapdoor(char* filepath)
         exit(1);
     }
 
-    result = EVP_DigestVerifyUpdate(context, string_content, strlen(string_content));
+    result = EVP_DigestVerifyUpdate(context, string_message, message_len);
 
     if (result != 1)
     {
@@ -480,12 +470,13 @@ int verify_hmac_trapdoor(char* filepath)
         exit(1);
     }
 
-    result = EVP_DigestVerifyFinal(context, string_checksum_content, strlen(string_checksum_content));
+    // TODO fix this
+    result = EVP_DigestVerifyFinal(context, string_signature, signature_len);
 
     return result;
 }
 
-char* decrypt_string_trapdoor(char* ciphertext)
+char* decrypt_string_trapdoor(char* ciphertext, int ciphertext_len)
 {
     char* filepath_random_number = concatenate_strings(PART_2_SUB_DIRECTORY, get_username());
     char* dummy = filepath_random_number;
@@ -502,15 +493,16 @@ char* decrypt_string_trapdoor(char* ciphertext)
     char* iv;
     generate_key_iv(&key, &iv);
 
-    char* string_random_encrypted = read_from_file(filepath_random_number);
-    char* string_random = decrypt_string(string_random_encrypted, key, iv);
+    int ciphertext_len_random;
+    char* string_random_encrypted = read_from_file_with_num_bytes(filepath_random_number, &ciphertext_len_random);
+    char* string_random = decrypt_string(string_random_encrypted, key, iv, ciphertext_len_random);
 
 
     char* key_trapdoor;
     char* iv_trapdoor;
     generate_key_iv_from_passphrase_and_salt(&key, &iv, string_random, get_username());
 
-    char* plaintext = decrypt_string(ciphertext, key_trapdoor, iv_trapdoor);
+    char* plaintext = decrypt_string(ciphertext, key_trapdoor, iv_trapdoor, ciphertext_len);
 
     return plaintext;
 }
