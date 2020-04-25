@@ -4,6 +4,7 @@
 #include <pwd.h>
 #include <string.h>
 #include <shadow.h>
+#include <sys/stat.h>
 #include <openssl/evp.h>
 #include <openssl/sha.h>
 #include <openssl/crypto.h>
@@ -365,6 +366,13 @@ EVP_PKEY* read_rsa_private_key_from_file()
         exit(1);
     }
 
+    chmod(filepath_rsa_credentials, 0600);
+
+    if (!validate(get_username(), filepath_rsa_credentials, 110))
+    {
+        printf("You miss either of read/write permission on %s\n", filepath_rsa_credentials);
+        exit(1);
+    }
 
     FILE* rsa_pem_file = fopen(filepath_rsa_credentials, "r");
     EVP_PKEY* rsa_private_key = PEM_read_PrivateKey(rsa_pem_file, NULL, NULL, NULL);
@@ -395,6 +403,13 @@ EVP_PKEY* read_rsa_public_key_from_file()
         // TODO assume that the current user will always have a file with his/her name
         // and the related permissions?
         printf("Missing file: %s\n", filepath_rsa_credentials);
+        exit(1);
+    }
+
+    chmod(filepath_rsa_credentials, 0600);
+    if (!validate(get_username(), filepath_rsa_credentials, 110))
+    {
+        printf("You are missing either of read/write permissions on %s\n", filepath_rsa_credentials);
         exit(1);
     }
 

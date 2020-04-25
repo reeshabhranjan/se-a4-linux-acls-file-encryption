@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <sys/stat.h>
 
 char* concatenate_strings(char* s1, char* s2)
 {
