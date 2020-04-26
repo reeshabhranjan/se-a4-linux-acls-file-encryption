@@ -2,6 +2,7 @@ debug/
 debug_files/
 files/*
 files/part-2/*
+*.zip
 !files/part-2/reeshabh.private
 !files/part-2/reeshabh.public
 !files/part-2/reeshabh.rand
