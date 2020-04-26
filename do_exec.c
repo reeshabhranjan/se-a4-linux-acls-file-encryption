@@ -6,6 +6,7 @@
 #include <pwd.h>
 #include "acl.h"
 #include "security.h"
+#include "encrypt.h"
 
 int main(int argc, char* argv[])
 {
@@ -40,11 +41,19 @@ int main(int argc, char* argv[])
 
     int owner_uid = pwd -> pw_uid;
 
-    seteuid(owner_uid); // TODO use setuid() here
-
-    printf("UID: %d EUID: %d\n", getuid(), geteuid());
 
     // TODO also check for permissions of the caller
+
+    if (!validate(get_username(), filepath, 1))
+    {
+        printf("You are not allowed to run the file.\n");
+        exit(1);
+    }
+
+    setuid(owner_uid); // TODO use setuid() here
+
+    printf("UID: %d EUID: %d\n", getuid(), geteuid());
+    
     if (!validate(owner_name, filepath, 1))
     {
         perror("You do not have sufficient permissions (as owner)!");
