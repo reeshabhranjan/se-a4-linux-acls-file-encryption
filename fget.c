@@ -62,8 +62,14 @@ int main(int argc, char* argv[])
         exit(1);
     }
 
-    char* buf = read_from_file(filepath);
-    printf("%s", buf);
+    int buf_len;
+    char* buf = read_from_file_with_num_bytes(filepath, &buf_len);
+    for (int i = 0; i < buf_len; i++)
+    {
+        printf("%c", buf[i]);
+    }
+    
+    // printf("%s", buf);
 
     seteuid(getuid());
     printf("UID: %d EUID: %d\n", getuid(), geteuid());

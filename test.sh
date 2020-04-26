@@ -1,5 +1,6 @@
 redcolor='\033[0;31m'
 yellowcolor='\033[1;33m'
+bluecolor='\033[1;34m'
 resetcolor='\033[0m'
 echo -e "${redcolor}---BUILDING FILES---${resetcolor}"
 echo ""
@@ -9,13 +10,26 @@ cd files
 
 echo ""
 echo ""
-echo -e "${redcolor}---TESTING FPUT---${resetcolor}"
+echo -e "${redcolor}---PREPROCESSING---${resetcolor}"
+echo ""
+echo -e "${yellowcolor}>> Cleaning temporary files used in this test.${resetcolor}"
+sudo rm abc.*
+echo ""
+echo -e "${yellowcolor}>> Creating a directory with no write permissions.${resetcolor}"
+mkdir inaccessible_directory
+sudo chmod 000 inaccessible_directory
+echo -e "${bluecolor}[ACL of inaccessible_directory]${resetcolor}"
+./getacl inaccessible_directory
+
+echo ""
+echo ""
+echo -e "${redcolor}---TESTING FPUT, FGET---${resetcolor}"
 echo ""
 
 echo "Reeshabh" > input.txt
-echo ">> Calling myfput"
+echo -e "${yellowcolor}>> Calling myfput${resetcolor}"
 ./myfput abc.txt < input.txt
-echo ">> Calling myfget"
+echo -e "${yellowcolor}>> Calling myfget${resetcolor}"
 ./myfget abc.txt
 
 echo ""
@@ -51,10 +65,15 @@ rm abc.txt.sign
 echo -e "${yellowcolor}>> Calling myfget${resetcolor}"
 ./myfget abc.txt
 
+echo ""
+echo -e "${yellowcolor}>> Trying to create a new file in inaccessible_directory (with no write permission)...${resetcolor}"
+echo ""
+
+./myfput inaccessible_directory/non_existent.txt
 
 echo ""
 echo ""
-echo -e "${redcolor}---TESTING FPUT_ENCRYPT---${resetcolor}"
+echo -e "${redcolor}---TESTING FPUT_ENCRYPT, FGET_DECRYPT---${resetcolor}"
 echo ""
 
 echo "Reeshabh" > input.txt
@@ -96,10 +115,15 @@ rm abc.txt.sign
 echo -e "${yellowcolor}>> Calling fget_decrypt${resetcolor}"
 ./fget_decrypt abc.txt
 
+echo ""
+echo -e "${yellowcolor}>> Trying to create a new file in inaccessible_directory (with no write permission)...${resetcolor}"
+echo ""
+
+./fput_encrypt inaccessible_directory/non_existent.txt
 
 echo ""
 echo ""
-echo -e "${redcolor}---TESTING FPUT_ENCRYPT_RSA---${resetcolor}"
+echo -e "${redcolor}---TESTING FPUT_ENCRYPT_RSA, FGET_DECRYPT_RSA---${resetcolor}"
 echo ""
 
 echo "Reeshabh" > input.txt
@@ -165,3 +189,35 @@ mv part-2/reeshabh1.public part-2/reeshabh.public
 
 echo -e "${yellowcolor}>> Calling fget_decrypt_rsa${resetcolor}"
 ./fget_decrypt_rsa abc.txt
+
+echo ""
+echo -e "${yellowcolor}>> Changing ownership of RSA-files${resetcolor}"
+./setacl -m u:reeshabh:--- part-2/reeshabh.private
+./setacl -m u:reeshabh:--- part-2/reeshabh.public
+echo -e "${bluecolor}[ACL of part-2/reeshabh.private]${resetcolor}"
+./getacl part-2/reeshabh.private
+echo -e "${bluecolor}[ACL of part-2/reeshabh.public]${resetcolor}"
+./getacl part-2/reeshabh.public
+
+echo ""
+echo -e "${yellowcolor}>> Calling fget_decrypt_rsa${resetcolor}"
+./fget_decrypt_rsa abc.txt
+
+echo ""
+echo -e "${yellowcolor}>> Restoring ownership of RSA-files${resetcolor}"
+./setacl -m u:reeshabh:r-- part-2/reeshabh.private
+./setacl -m u:reeshabh:r-- part-2/reeshabh.public
+echo -e "${bluecolor}[ACL of part-2/reeshabh.private]${resetcolor}"
+./getacl part-2/reeshabh.private
+echo -e "${bluecolor}[ACL of part-2/reeshabh.public]${resetcolor}"
+./getacl part-2/reeshabh.public
+
+echo ""
+echo -e "${yellowcolor}>> Calling fget_decrypt_rsa${resetcolor}"
+./fget_decrypt_rsa abc.txt
+
+echo ""
+echo -e "${yellowcolor}>> Trying to create a new file in inaccessible_directory (with no write permission)...${resetcolor}"
+echo ""
+
+./fput_encrypt_rsa inaccessible_directory/non_existent.txt

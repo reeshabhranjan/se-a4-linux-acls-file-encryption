@@ -12,5 +12,6 @@ char* encrypt_string_trapdoor(char* buffer, int* ciphertext_len_return);
 int verify_hmac_trapdoor(char* filepath);
 char* create_hmac_trapdoor(char* buffer, int buffer_len, int* signature_len);
 char* decrypt_string_trapdoor(char* ciphertext, int ciphertext_len);
+char* get_username();
 
 #endif

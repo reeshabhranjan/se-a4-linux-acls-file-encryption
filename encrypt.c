@@ -366,11 +366,11 @@ EVP_PKEY* read_rsa_private_key_from_file()
         exit(1);
     }
 
-    chmod(filepath_rsa_credentials, 0600);
+    // chmod(filepath_rsa_credentials, 0600);
 
-    if (!validate(get_username(), filepath_rsa_credentials, 110))
+    if (!validate(get_username(), filepath_rsa_credentials, 100))
     {
-        printf("You miss either of read/write permission on %s\n", filepath_rsa_credentials);
+        printf("You miss the read permission on %s\n", filepath_rsa_credentials);
         exit(1);
     }
 
@@ -405,11 +405,11 @@ EVP_PKEY* read_rsa_public_key_from_file()
         printf("Missing file: %s\n", filepath_rsa_credentials);
         exit(1);
     }
-
-    chmod(filepath_rsa_credentials, 0600);
-    if (!validate(get_username(), filepath_rsa_credentials, 110))
+    // chown()
+    // chmod(filepath_rsa_credentials, 0600);
+    if (!validate(get_username(), filepath_rsa_credentials, 100))
     {
-        printf("You are missing either of read/write permissions on %s\n", filepath_rsa_credentials);
+        printf("You miss the read permissions on %s\n", filepath_rsa_credentials);
         exit(1);
     }
 

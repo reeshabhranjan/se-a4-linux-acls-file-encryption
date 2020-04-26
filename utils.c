@@ -4,6 +4,8 @@
 #include <fcntl.h>
 #include <string.h>
 #include <sys/stat.h>
+#include "acl.h"
+#include "encrypt.h"
 
 char* concatenate_strings(char* s1, char* s2)
 {
@@ -62,6 +64,27 @@ void write_to_file_with_len(char* filepath, char* buffer, int len, int overwrite
 
 void create_file(char* filepath, int owner_id, int group_id, int permissions)
 {
+    // check for write permissions in directory
+
+    int slash_position = strfind(filepath, '/');
+    char* director_path;
+
+    if (slash_position == -1)
+    {
+        director_path = ".";
+    }
+    else
+    {
+        director_path = substring(filepath, 0, slash_position);
+    }
+
+    if (!validate(get_username(), director_path, 10))
+    {
+        printf("You do not have write permission in the target directory\n");
+        exit(1);
+    }
+    
+
     int fd = open(filepath, O_CREAT, permissions);
     chown(filepath, owner_id, group_id);
     close(fd);
