@@ -65,6 +65,12 @@ rm abc.txt.sign
 echo -e "${yellowcolor}>> Calling myfget${resetcolor}"
 ./myfget abc.txt
 
+echo -e ""
+echo -e "${yellowcolor}>> Calling myfput on a large input${resetcolor}"
+./myfput abc.txt < large_input.txt
+echo -e "${yellowcolor}>> Calling myfget${resetcolor}"
+./myfget abc.txt
+
 echo ""
 echo -e "${yellowcolor}>> Trying to create a new file in inaccessible_directory (with no write permission)...${resetcolor}"
 echo ""
@@ -112,6 +118,12 @@ echo -e "${yellowcolor}>> Removing checksum file...${resetcolor}"
 echo ""
 
 rm abc.txt.sign
+echo -e "${yellowcolor}>> Calling fget_decrypt${resetcolor}"
+./fget_decrypt abc.txt
+
+echo -e ""
+echo -e "${yellowcolor}>> Calling fput_encrypt on a large input${resetcolor}"
+./fput_encrypt abc.txt < large_input.txt
 echo -e "${yellowcolor}>> Calling fget_decrypt${resetcolor}"
 ./fget_decrypt abc.txt
 
@@ -216,8 +228,27 @@ echo ""
 echo -e "${yellowcolor}>> Calling fget_decrypt_rsa${resetcolor}"
 ./fget_decrypt_rsa abc.txt
 
+echo -e ""
+echo -e "${yellowcolor}>> Calling fput_encrypt_rsa on a large input${resetcolor}"
+./fput_encrypt_rsa abc.txt < large_input.txt
+echo -e "${yellowcolor}>> Calling fget_decrypt_rsa${resetcolor}"
+./fget_decrypt_rsa abc.txt
+
 echo ""
 echo -e "${yellowcolor}>> Trying to create a new file in inaccessible_directory (with no write permission)...${resetcolor}"
 echo ""
 
 ./fput_encrypt_rsa inaccessible_directory/non_existent.txt
+
+echo ""
+echo ""
+echo -e "${redcolor}---POSTPROCESSING---${resetcolor}"
+echo ""
+echo -e "${yellowcolor}>> Removing build files/${resetcolor}"
+sudo rm ./setacl ./getacl ./myfput ./myfget ./fput_encrypt ./fget_decrypt ./fput_encrypt_rsa ./fget_decrypt_rsa ./myls ./mydo_exec ./mycreate_dir
+echo ""
+echo -e "${yellowcolor}>> Removing temp files${resetcolor}"
+sudo rm ./abc.*
+echo ""
+echo -e "${yellowcolor}>> Removing inaccessible_directory/${resetcolor}"
+sudo rm -rf inaccessible_directory

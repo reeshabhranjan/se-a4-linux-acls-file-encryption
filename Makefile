@@ -3,7 +3,7 @@ build:
 	gcc -g -o files/myfput fput.c acl.c security.c utils.c encrypt.c -lcrypto
 	gcc -g -o files/myfget fget.c acl.c security.c utils.c encrypt.c -lcrypto
 	gcc -g -o files/mycreate_dir create_dir.c acl.c security.c
-	gcc -g -o files/mydo_exec do_exec.c acl.c security.c
+	gcc -g -o files/mydo_exec do_exec.c acl.c security.c encrypt.c utils.c -lcrypto
 	gcc -g -o files/getacl getacl.c acl.c security.c
 	gcc -g -o files/setacl setacl.c acl.c security.c
 	# encryption functions
