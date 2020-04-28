@@ -1,2 +1,2 @@
 # SE-assignment-2
-Implementing ACLs in linux.
+Implementing ACLs, encrypted I/O for Linux using C.
