@@ -244,7 +244,7 @@ echo ""
 echo ""
 echo -e "${redcolor}---POSTPROCESSING---${resetcolor}"
 echo ""
-echo -e "${yellowcolor}>> Removing build files/${resetcolor}"
+echo -e "${yellowcolor}>> Removing build files${resetcolor}"
 sudo rm ./setacl ./getacl ./myfput ./myfget ./fput_encrypt ./fget_decrypt ./fput_encrypt_rsa ./fget_decrypt_rsa ./myls ./mydo_exec ./mycreate_dir ./testing
 echo ""
 echo -e "${yellowcolor}>> Removing temp files${resetcolor}"
